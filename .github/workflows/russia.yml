@@ -1,0 +1,32 @@
+# .github/workflows/canada.yml
+name: Russia - News Pipeline
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch_news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Restore Firebase credential JSON
+        run: echo "${{ secrets.FIREBASE_CREDENTIAL_JSON }}" | base64 -d > serviceAccountKey.json
+
+      - name: Run news pipeline for Russia
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_URL: ${{ secrets.AI_URL }}
+          FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
+        run: python pipeline/news_pipeline.py russia

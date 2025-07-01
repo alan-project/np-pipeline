@@ -1,0 +1,32 @@
+name: Canada - Daily Popular Pipeline
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily_popular:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Restore Firebase credential JSON
+        run: echo "${{ secrets.FIREBASE_CREDENTIAL_JSON }}" | base64 -d > serviceAccountKey.json
+
+      - name: Run daily popular pipeline for Canada
+        env:
+          FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
+          AI_URL: ${{ secrets.AI_URL }}
+          CANADA_API_URL: ${{ secrets.CANADA_API_URL }}
+        run: python pipeline/daily_popular_pipeline.py canada
