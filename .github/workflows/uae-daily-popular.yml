@@ -29,5 +29,5 @@ jobs:
         env:
           FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
           AI_URL: ${{ secrets.AI_URL }}
-          UAE_API_URL: ${{ secrets.UAE_API_URL }}
+          NEWS_API_URL: ${{ secrets.UAE_API_URL }}
         run: python pipeline/daily_popular_pipeline.py uae

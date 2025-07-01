@@ -136,10 +136,14 @@ def process_article(article, api_key):
     return article
 
 def select_top_articles(articles, top_article_count, config):
-    api_url = "https://api.openai.com/v1/chat/completions"
+    api_url = os.getenv("AI_URL")
     api_key = config["api_key"]
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
+    print(f"\n**Available articles for selection:**")
+    for article in articles:
+        print(f"  - ID: {article['article_id']}, Title: {article.get('title', 'No title')}")
+    
     prompt = config["top_prompt"](top_article_count) + "\n\nHere are the articles:\n\n" + \
         "\n".join([
             f"Article ID: {article['article_id']}\n"
@@ -158,7 +162,9 @@ def select_top_articles(articles, top_article_count, config):
     try:
         response = requests.post(api_url, headers=headers, json=data)
         if response.status_code == 200:
-            content = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip().split("\n")
+            ai_response = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
+            print(f"\n**AI Response for article selection:**\n{ai_response}")
+            content = ai_response.split("\n")
             selected_articles = [article_id.strip() for article_id in content if article_id.strip()][:top_article_count]
             
             print("\n**AI selected TOP article list (removed duplicates):**")

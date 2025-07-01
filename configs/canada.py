@@ -44,7 +44,8 @@ Selection criteria:
 - Reader engagement potential
 - Avoid selecting multiple articles with very similar or identical titles
 
-Return ONLY the article IDs of the selected articles, one per line.
+IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below. Copy the exact ID format.
+Return ONLY the article IDs of the selected articles, one per line, nothing else.
 """
 
 config = {
