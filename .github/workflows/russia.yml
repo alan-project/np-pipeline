@@ -28,5 +28,6 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AI_URL: ${{ secrets.AI_URL }}
+          RUSSIA_API_URL: ${{ secrets.RUSSIA_API_URL }}
           FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
         run: python pipeline/news_pipeline.py russia
