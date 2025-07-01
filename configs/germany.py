@@ -49,7 +49,7 @@ Return ONLY the article IDs of the selected articles, one per line.
 
 config = {
     "country": "Germany",
-    "api_url": os.getenv("GERMANY_API_URL"),
+    "api_url": os.getenv("NEWS_API_URL"),
     "firestore_collection": "germany_articles",
     "info_doc": "germany_info",
     "lang_list": ["en", "ar", "tr", "ru"],
