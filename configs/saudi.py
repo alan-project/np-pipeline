@@ -49,6 +49,7 @@ config = {
     "api_url": os.getenv("NEWS_API_URL"),
     "firestore_collection": "saudi_articles",
     "info_doc": "saudi_info",
+    "base_lang": "ar",
     "lang_list": ["ur", "hi", "bn", "en"],
     "select_all": True,
     "top_article_ratio": 0.5,

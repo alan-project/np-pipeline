@@ -47,7 +47,7 @@ def process_article(article, config, api_key):
                 return None
             translations[lang] = result
 
-    translations["en"] = {
+    translations[config["base_lang"]] = {
         "ai_title": ai_summary["ai_title"],
         "ai_content": ai_summary["ai_content"]
     }

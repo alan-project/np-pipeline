@@ -52,6 +52,7 @@ config = {
     "api_url": os.getenv("NEWS_API_URL"),
     "firestore_collection": "russia_articles",
     "info_doc": "russia_info",
+    "base_lang": "ru",
     "lang_list": ["en", "de", "zh", "ar"],
     "select_all": False,
     "top_article_ratio": 0.2,

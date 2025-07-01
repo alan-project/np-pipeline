@@ -53,6 +53,7 @@ config = {
     "api_url": os.getenv("NEWS_API_URL"),
     "firestore_collection": "canada_articles",
     "info_doc": "canada_info",
+    "base_lang": "en",
     "lang_list": ["ko", "hi", "zh", "ar"],
     "select_all": False,
     "top_article_ratio": 0.2,
