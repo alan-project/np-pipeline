@@ -53,7 +53,7 @@ config = {
     "firestore_collection": "russia_articles",
     "info_doc": "russia_info",
     "base_lang": "ru",
-    "lang_list": ["en", "de", "zh", "ar"],
+    "lang_list": ["en", "uk", "tg", "uz"],
     "select_all": False,
     "top_article_ratio": 0.2,
     "timezone": "Europe/Moscow",
