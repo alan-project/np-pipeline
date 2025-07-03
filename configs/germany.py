@@ -53,7 +53,7 @@ config = {
     "firestore_collection": "germany_articles",
     "info_doc": "germany_info",
     "base_lang": "de",
-    "lang_list": ["en", "ar", "tr", "ru"],
+    "lang_list": ["en", "ar", "ro","tr", "ru"],
     "select_all": False,
     "top_article_ratio": 0.2,
     "timezone": "Europe/Berlin",
