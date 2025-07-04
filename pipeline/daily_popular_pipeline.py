@@ -38,6 +38,7 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
             snapshot = db.collection(config["firestore_collection"]) \
                 .where("pubDate", ">=", start_str) \
                 .where("pubDate", "<=", end_str) \
+                .where("clicked_cnt", ">", 0) \
                 .order_by("clicked_cnt", direction=firestore.Query.DESCENDING) \
                 .limit(limit) \
                 .stream()
@@ -45,17 +46,9 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
             articles = []
             for doc in snapshot:
                 data = doc.to_dict()
-                articles.append({
-                    "article_id": data.get("article_id"),
-                    "title": data.get("title"),
-                    "ai_title": data.get("ai_title"),
-                    "ai_content": data.get("ai_content"),
-                    "category_ai": data.get("category_ai"),
-                    "clicked_cnt": data.get("clicked_cnt", 0),
-                    "pubDate": data.get("pubDate"),
-                    "link": data.get("link"),
-                    "translations": data.get("translations", {})
-                })
+                if 'article_id' not in data:
+                    data['article_id'] = doc.id
+                articles.append(data)
 
             result[date_key] = articles
             print(f"{date_key}: {len(articles)} popular articles")
@@ -69,30 +62,31 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
 def save_daily_popular_to_firestore(daily_data, config):
     """Save daily popular articles to Firestore"""
     db = firestore.client()
+    utc_timezone = pytz.timezone('UTC')
+    country = config["country"].lower()
+    collection_name = f"{country}_daily_popular"
     
-    try:
-        # Save all daily data as a single document
-        db.collection(config["info_doc"]).document("daily_popular").set({
-            "daily_data": daily_data,
-            "lastUpdatedAt": datetime.now(),
-            "generated_by": "daily_popular_pipeline"
-        })
-        
-        print(f"Daily popular data saved to {config['info_doc']}/daily_popular")
-        
-        # Save summary statistics
-        total_articles = sum(len(articles) for articles in daily_data.values())
-        db.collection(config["info_doc"]).document("daily_popular_meta").set({
-            "total_days": len(daily_data),
-            "total_articles": total_articles,
-            "lastUpdatedAt": datetime.now(),
-            "country": config["country"]
-        }, merge=True)
-        
-        print(f"Saved {total_articles} articles across {len(daily_data)} days")
-        
-    except Exception as e:
-        print(f"Error saving to Firestore: {e}")
+    count = 0
+    for date_key, articles in daily_data.items():
+        if not articles:
+            print(f"{date_key} 기사 없음")
+            continue
+
+        doc = {
+            'articles': articles,
+            'updated_at': datetime.now(utc_timezone),
+            'count': len(articles),
+            'date': date_key
+        }
+
+        try:
+            db.collection(collection_name).document(date_key).set(doc)
+            print(f"{date_key} 저장 완료 ({len(articles)}개)")
+            count += 1
+        except Exception as e:
+            print(f"{date_key} 저장 오류: {e}")
+    
+    return count
 
 def main():
     if len(sys.argv) < 2:
@@ -124,8 +118,9 @@ def main():
     daily_data = get_daily_popular_articles(config, days_back=days_back, limit=limit_per_day)
     
     # Save to Firestore
-    save_daily_popular_to_firestore(daily_data, config)
+    updated = save_daily_popular_to_firestore(daily_data, config)
     
+    print(f"총 {updated}개 날짜의 문서 업데이트 완료")
     print("Daily popular pipeline DONE")
 
 if __name__ == "__main__":
