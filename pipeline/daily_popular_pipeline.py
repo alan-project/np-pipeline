@@ -38,7 +38,6 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
             snapshot = db.collection(config["firestore_collection"]) \
                 .where("pubDate", ">=", start_str) \
                 .where("pubDate", "<=", end_str) \
-                .where("clicked_cnt", ">", 0) \
                 .order_by("clicked_cnt", direction=firestore.Query.DESCENDING) \
                 .limit(limit) \
                 .stream()
