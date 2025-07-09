@@ -55,7 +55,7 @@ config = {
     "base_lang": "ru",
     "lang_list": ["en", "uk", "tg", "uz"],
     "select_all": False,
-    "top_article_ratio": 0.2,
+    "top_article_ratio": 0.1,
     "timezone": "Europe/Moscow",
     "daily_popular_days": 7,
     "daily_popular_limit": 10,
