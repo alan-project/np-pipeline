@@ -2,6 +2,7 @@ import importlib
 import sys
 import os
 from datetime import datetime
+import pytz
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add parent directory to Python path for absolute imports
@@ -86,7 +87,11 @@ def main():
     config = config_module.config
 
     print(f"Running pipeline for: {config['country']}")
-    print(f"START TIME: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    
+    # Get local time based on config timezone
+    local_tz = pytz.timezone(config['timezone'])
+    local_time = datetime.now(local_tz)
+    print(f"START TIME: {local_time.strftime('%Y-%m-%d %H:%M:%S')} {config['timezone']}")
 
     results = fetch_articles(config["api_url"], api_key, config)
     print(f"Processed {len(results)} articles")
