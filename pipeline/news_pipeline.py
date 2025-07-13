@@ -93,9 +93,8 @@ def main():
     local_time = datetime.now(local_tz)
     print(f"START TIME: {local_time.strftime('%Y-%m-%d %H:%M:%S')} {config['timezone']}")
 
-    results = fetch_articles(config["api_url"], api_key, config)
-    total_articles_fetched = len(results)
-    print(f"Processed {total_articles_fetched} articles")
+    results, total_available = fetch_articles(config["api_url"], api_key, config)
+    print(f"Processed {len(results)} articles")
 
     # Filter out None results (failed processing)
     valid_results = [article for article in results if article is not None]
@@ -104,7 +103,7 @@ def main():
     save_to_server(valid_results, config)
     
     # Save statistics
-    save_article_stats(total_articles_fetched, uploaded_articles, config)
+    save_article_stats(total_available, uploaded_articles, config)
     
     print("DONE")
 

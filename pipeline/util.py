@@ -214,7 +214,7 @@ def fetch_articles(api_url, api_key, config):
         processed_articles = [future.result() for future in as_completed(futures)]
         processed_articles = [article for article in processed_articles if article is not None]
 
-    return processed_articles
+    return processed_articles, len(all_articles)
 
 def save_to_firestore(data):
     collection_name = "saudi_articles"
