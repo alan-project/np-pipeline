@@ -14,7 +14,7 @@ from firebase_admin import credentials, firestore
 
 from pipeline.summarize import generate_ai_summary
 from pipeline.translate import translate_ai_summary
-from pipeline.firestore import save_to_server
+from pipeline.firestore import save_to_server, save_article_stats
 from pipeline.util import get_page_articles, fetch_articles, select_top_articles
 
 def process_article(article, config, api_key):
@@ -94,9 +94,18 @@ def main():
     print(f"START TIME: {local_time.strftime('%Y-%m-%d %H:%M:%S')} {config['timezone']}")
 
     results = fetch_articles(config["api_url"], api_key, config)
-    print(f"Processed {len(results)} articles")
+    total_articles_fetched = len(results)
+    print(f"Processed {total_articles_fetched} articles")
 
-    save_to_server(results, config)
+    # Filter out None results (failed processing)
+    valid_results = [article for article in results if article is not None]
+    uploaded_articles = len(valid_results)
+    
+    save_to_server(valid_results, config)
+    
+    # Save statistics
+    save_article_stats(total_articles_fetched, uploaded_articles, config)
+    
     print("DONE")
 
 

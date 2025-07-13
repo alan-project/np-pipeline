@@ -2,6 +2,7 @@ import firebase_admin
 import os
 from firebase_admin import credentials, firestore
 from datetime import datetime
+import pytz
 
 def save_to_server(data, config):
     """Save processed articles to Firestore"""
@@ -23,3 +24,31 @@ def save_to_server(data, config):
         print("meta data updated")
     except Exception as e:
         print(f"metadata update fail: {e}")
+
+
+def save_article_stats(total_articles, uploaded_articles, config):
+    """Save article statistics to Firestore with local timezone"""
+    db = firestore.client()
+    info_collection = config["info_doc"]
+    
+    # Get local time based on config timezone
+    local_tz = pytz.timezone(config['timezone'])
+    local_time = datetime.now(local_tz)
+    
+    # Format date and hour
+    date_str = local_time.strftime('%Y-%m-%d')
+    hour_str = local_time.strftime('%H')
+    
+    # Document structure: {date}/{hour}
+    doc_ref = db.collection(info_collection).document(date_str)
+    
+    # Update hourly stats
+    doc_ref.set({
+        f"hours.{hour_str}": {
+            "total_articles": total_articles,
+            "uploaded_articles": uploaded_articles,
+            "timestamp": local_time
+        }
+    }, merge=True)
+    
+    print(f"Stats saved: {date_str} {hour_str}:00 - Total: {total_articles}, Uploaded: {uploaded_articles}")
