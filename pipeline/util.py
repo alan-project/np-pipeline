@@ -190,10 +190,25 @@ def get_page_articles(url):
     return [], None
 
 def fetch_articles(api_url, api_key, config):
-    first_page_articles, _ = get_page_articles(api_url)
-    print("\n**first page article number:**", len(first_page_articles))
+    all_articles = []
+    next_page = None
+    page_count = 0
     
-    all_articles = first_page_articles
+    # Get first page
+    first_page_articles, next_page = get_page_articles(api_url)
+    all_articles.extend(first_page_articles)
+    page_count += 1
+    print(f"\n**Page {page_count} article number:**", len(first_page_articles))
+    
+    # Get remaining pages if nextPage exists
+    while next_page:
+        page_url = f"{api_url}&page={next_page}"
+        page_articles, next_page = get_page_articles(page_url)
+        all_articles.extend(page_articles)
+        page_count += 1
+        print(f"**Page {page_count} article number:**", len(page_articles))
+    
+    print(f"\n**Total pages fetched:** {page_count}")
     print("**AI target article numbers (description included):**", len(all_articles))
     
     if config["select_all"]:
