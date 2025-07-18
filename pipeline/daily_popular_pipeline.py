@@ -121,13 +121,16 @@ Article titles:
 Requirements:
 - Write in English only
 - List 2-3 most important events/topics in simple phrases
-- Separate each event with comma and space
+- Return each event on a separate line
 - Keep each event description under 10 words
 - Focus on the most significant news only
 - Be concise and specific
-- Do NOT include any prefix or format text, just the event list
+- Do NOT include any numbering, bullets, or prefix text
 
-Example: "serious traffic accident, government policy announcement, local protest"
+Example output:
+serious traffic accident in downtown
+government policy announcement on housing
+local protest against new regulations
 
 If no significant news is found, return: "no major updates"
 """
@@ -148,7 +151,17 @@ If no significant news is found, return: "no major updates"
             result = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
             print(f"AI generated briefing: '{result}'")
             print(f"Briefing length: {len(result)} characters")
-            return result
+            
+            # Convert to numbered list
+            if result.lower() == "no major updates":
+                return result
+            
+            events = [event.strip() for event in result.split('\n') if event.strip()]
+            numbered_events = [f"{i+1}. {event}" for i, event in enumerate(events)]
+            final_result = ", ".join(numbered_events)
+            
+            print(f"Numbered briefing: '{final_result}'")
+            return final_result
         else:
             print(f"AI API failed with status {response.status_code}")
             print(f"Response text: {response.text}")
@@ -218,10 +231,12 @@ def send_yesterday_briefing(daily_data, config):
         print("Failed to generate briefing summary")
         return
     
-    # Send push notification
-    push_title = "Today's News Briefing"
+    # Send push notification with yesterday's date
+    yesterday_date = yesterday.strftime("%B %d") # e.g., "January 15"
+    # push_title = f"Yesterday's News ({yesterday_date})"
+    push_title = f"Quick News Recap"
     # Add prefix to the briefing message
-    final_message = f"Don't miss yesterday's updates: {briefing_message}"
+    final_message = f"Don't miss the updates: {briefing_message}"
     
     country_code = config["country"].lower()
     if country_code == "saudi":
