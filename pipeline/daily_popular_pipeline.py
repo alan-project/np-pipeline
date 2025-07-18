@@ -94,7 +94,7 @@ def generate_briefing_summary(article_titles, config):
     print(f"Starting briefing summary generation for {len(article_titles)} articles")
     
     api_url = os.getenv("AI_URL")
-    api_key = config.get("api_key") or os.getenv("API_KEY")
+    api_key = config.get("api_key") or os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
     
     if not api_url or not api_key:
         print("ERROR: AI_URL or API_KEY not found, skipping briefing")

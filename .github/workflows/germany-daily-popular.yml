@@ -29,4 +29,5 @@ jobs:
           FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
           AI_URL: ${{ secrets.AI_URL }}
           NEWS_API_URL: ${{ secrets.GERMANY_API_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python pipeline/daily_popular_pipeline.py germany
