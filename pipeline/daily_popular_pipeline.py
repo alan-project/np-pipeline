@@ -161,7 +161,7 @@ If no significant news is found, return: "no major updates"
 
 def send_briefing_push(title, message, country):
     """Send briefing push notification via Firebase function"""
-    function_url = os.getenv("FIREBASE_FUNCTION_URL") or "https://your-function-url/sendBriefingPushByCountry"
+    function_url = os.getenv("FIREBASE_FUNCTION_URL") or "https://sendbriefingpushbycountry-ladydgb7za-uc.a.run.app"
     
     payload = {
         "title": title,
