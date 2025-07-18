@@ -1,6 +1,8 @@
 import importlib
 import sys
 import os
+import requests
+import json
 from datetime import datetime, timedelta
 import pytz
 import firebase_admin
@@ -87,6 +89,138 @@ def save_daily_popular_to_firestore(daily_data, config):
     
     return count
 
+def generate_briefing_summary(article_titles, config):
+    """Generate a briefing summary from article titles using AI"""
+    api_url = os.getenv("AI_URL")
+    api_key = config.get("api_key") or os.getenv("API_KEY")
+    
+    if not api_url or not api_key:
+        print("AI_URL or API_KEY not found, skipping briefing")
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    # Join article titles
+    titles_text = "\n".join([f"- {title}" for title in article_titles])
+    
+    prompt = f"""
+Look at these news article titles from yesterday's most popular news and list the key events in English.
+
+Article titles:
+{titles_text}
+
+Requirements:
+- Write in English only
+- List 2-3 most important events/topics in simple phrases
+- Separate each event with comma and space
+- Keep each event description under 10 words
+- Focus on the most significant news only
+- Be concise and specific
+- Do NOT include any prefix or format text, just the event list
+
+Example: "serious traffic accident, government policy announcement, local protest"
+
+If no significant news is found, return: "no major updates"
+"""
+    
+    data = {
+        "model": "gpt-4o-mini",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 150,
+        "temperature": 0.3
+    }
+    
+    try:
+        response = requests.post(api_url, headers=headers, json=data)
+        if response.status_code == 200:
+            result = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
+            print(f"AI generated briefing: {result}")
+            return result
+        else:
+            print(f"AI API failed: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Error generating briefing summary: {e}")
+        return None
+
+def send_briefing_push(title, message, country):
+    """Send briefing push notification via Firebase function"""
+    function_url = os.getenv("FIREBASE_FUNCTION_URL") or "https://your-function-url/sendBriefingPushByCountry"
+    
+    payload = {
+        "title": title,
+        "message": message,
+        "country": country
+    }
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        response = requests.post(function_url, headers=headers, json=payload)
+        if response.status_code == 200:
+            print(f"Push notification sent successfully to {country}")
+            return True
+        else:
+            print(f"Failed to send push notification: {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
+    except Exception as e:
+        print(f"Error sending push notification: {e}")
+        return False
+
+def send_yesterday_briefing(daily_data, config):
+    """Send briefing push for yesterday's popular articles"""
+    local_tz = pytz.timezone(config["timezone"])
+    yesterday = datetime.now(local_tz) - timedelta(days=1)
+    yesterday_key = yesterday.strftime("%Y-%m-%d")
+    
+    yesterday_articles = daily_data.get(yesterday_key, [])
+    
+    if not yesterday_articles:
+        print(f"No articles found for yesterday ({yesterday_key}), skipping briefing")
+        return
+    
+    # Extract titles from articles
+    article_titles = []
+    for article in yesterday_articles[:10]:  # Limit to top 10
+        title = article.get('title', '')
+        if title:
+            article_titles.append(title)
+    
+    if not article_titles:
+        print("No article titles found, skipping briefing")
+        return
+    
+    print(f"Processing {len(article_titles)} article titles for briefing")
+    
+    # Generate briefing summary
+    briefing_message = generate_briefing_summary(article_titles, config)
+    
+    if not briefing_message:
+        print("Failed to generate briefing summary")
+        return
+    
+    # Send push notification
+    push_title = "Today's News Briefing"
+    # Add prefix to the briefing message
+    final_message = f"Don't miss yesterday's updates: {briefing_message}"
+    
+    country_code = config["country"].lower()
+    if country_code == "saudi":
+        country_code = "sa"  # Convert saudi to sa for country code
+    
+    success = send_briefing_push(push_title, final_message, country_code)
+    
+    if success:
+        print("Briefing push sent successfully")
+    else:
+        print("Failed to send briefing push")
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python daily_popular_pipeline.py <country>")
@@ -120,6 +254,11 @@ def main():
     updated = save_daily_popular_to_firestore(daily_data, config)
     
     print(f"총 {updated}개 날짜의 문서 업데이트 완료")
+    
+    # Send briefing push for yesterday's popular articles
+    print("Sending briefing push notification...")
+    send_yesterday_briefing(daily_data, config)
+    
     print("Daily popular pipeline DONE")
 
 if __name__ == "__main__":
