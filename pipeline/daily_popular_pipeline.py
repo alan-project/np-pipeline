@@ -91,12 +91,17 @@ def save_daily_popular_to_firestore(daily_data, config):
 
 def generate_briefing_summary(article_titles, config):
     """Generate a briefing summary from article titles using AI"""
+    print(f"Starting briefing summary generation for {len(article_titles)} articles")
+    
     api_url = os.getenv("AI_URL")
     api_key = config.get("api_key") or os.getenv("API_KEY")
     
     if not api_url or not api_key:
-        print("AI_URL or API_KEY not found, skipping briefing")
+        print("ERROR: AI_URL or API_KEY not found, skipping briefing")
         return None
+    
+    print(f"Using AI API URL: {api_url}")
+    print(f"API key configured: {'Yes' if api_key else 'No'}")
     
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -105,6 +110,7 @@ def generate_briefing_summary(article_titles, config):
     
     # Join article titles
     titles_text = "\n".join([f"- {title}" for title in article_titles])
+    print(f"Article titles to process:\n{titles_text}")
     
     prompt = f"""
 Look at these news article titles from yesterday's most popular news and list the key events in English.
@@ -133,17 +139,24 @@ If no significant news is found, return: "no major updates"
         "temperature": 0.3
     }
     
+    print("Sending request to AI API...")
     try:
         response = requests.post(api_url, headers=headers, json=data)
+        print(f"AI API response status: {response.status_code}")
+        
         if response.status_code == 200:
             result = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
-            print(f"AI generated briefing: {result}")
+            print(f"AI generated briefing: '{result}'")
+            print(f"Briefing length: {len(result)} characters")
             return result
         else:
-            print(f"AI API failed: {response.status_code}")
+            print(f"AI API failed with status {response.status_code}")
+            print(f"Response text: {response.text}")
             return None
     except Exception as e:
-        print(f"Error generating briefing summary: {e}")
+        print(f"ERROR generating briefing summary: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         return None
 
 def send_briefing_push(title, message, country):
