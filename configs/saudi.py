@@ -54,7 +54,7 @@ config = {
     "select_all": False,
     "top_article_ratio": 0.2,
     "timezone": "Asia/Riyadh",
-    "daily_popular_days": 7,
+    "daily_popular_days": 2,
     "daily_popular_limit": 10,
     "summarization_prompt": summarization_prompt,
     "translation_prompt": translation_prompt,
