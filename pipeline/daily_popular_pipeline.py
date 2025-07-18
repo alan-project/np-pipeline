@@ -89,9 +89,9 @@ def save_daily_popular_to_firestore(daily_data, config):
     
     return count
 
-def generate_briefing_summary(article_titles, config):
-    """Generate a briefing summary from article titles using AI"""
-    print(f"Starting briefing summary generation for {len(article_titles)} articles")
+def generate_briefing_summary(top_articles, config):
+    """Generate a briefing summary from top 3 articles using AI"""
+    print(f"Starting briefing summary generation for {len(top_articles)} articles")
     
     api_url = os.getenv("AI_URL")
     api_key = config.get("api_key") or os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
@@ -108,31 +108,33 @@ def generate_briefing_summary(article_titles, config):
         "Content-Type": "application/json"
     }
     
-    # Join article titles
-    titles_text = "\n".join([f"- {title}" for title in article_titles])
-    print(f"Article titles to process:\n{titles_text}")
+    # Create article list with titles
+    articles_text = ""
+    for i, article in enumerate(top_articles, 1):
+        title = article.get('title', 'No title')
+        articles_text += f"Article {i}: {title}\n"
+    
+    print(f"Top 3 articles to process:\n{articles_text}")
     
     prompt = f"""
-Look at these news article titles from yesterday's most popular news and list the key events in English.
+Here are the top 3 most popular news articles from yesterday. Please shorten each title to a very brief phrase (under 8 words each) in English.
 
-Article titles:
-{titles_text}
+{articles_text}
 
 Requirements:
 - Write in English only
-- List 2-3 most important events/topics in simple phrases
-- Return each event on a separate line
-- Keep each event description under 10 words
-- Focus on the most significant news only
-- Be concise and specific
-- Do NOT include any numbering, bullets, or prefix text
+- Shorten each article title to under 8 words
+- Return exactly 3 lines, one for each article
+- Keep the essence of the news but make it very concise
+- Do NOT include numbering or article labels
+- Focus on the main topic/event
 
 Example output:
-serious traffic accident in downtown
-government policy announcement on housing
-local protest against new regulations
+Ford government releases transit emails
+Federal judge rules on funding dispute
+Housing approach causes community friction
 
-If no significant news is found, return: "no major updates"
+Return exactly 3 shortened phrases, one per line.
 """
     
     data = {
@@ -152,15 +154,22 @@ If no significant news is found, return: "no major updates"
             print(f"AI generated briefing: '{result}'")
             print(f"Briefing length: {len(result)} characters")
             
-            # Convert to numbered list
-            if result.lower() == "no major updates":
-                return result
-            
+            # Convert to numbered list - expect exactly 3 lines
             events = [event.strip() for event in result.split('\n') if event.strip()]
+            
+            # Ensure we have exactly 3 events
+            if len(events) < 3:
+                print(f"Warning: Expected 3 events but got {len(events)}")
+                # Pad with empty if needed
+                while len(events) < 3:
+                    events.append("news update")
+            elif len(events) > 3:
+                events = events[:3]  # Take only first 3
+            
             numbered_events = [f"{i+1}. {event}" for i, event in enumerate(events)]
             final_result = ", ".join(numbered_events)
             
-            print(f"Numbered briefing: '{final_result}'")
+            print(f"Numbered briefing (3 items): '{final_result}'")
             return final_result
         else:
             print(f"AI API failed with status {response.status_code}")
@@ -211,21 +220,17 @@ def send_yesterday_briefing(daily_data, config):
         print(f"No articles found for yesterday ({yesterday_key}), skipping briefing")
         return
     
-    # Extract titles from articles
-    article_titles = []
-    for article in yesterday_articles[:10]:  # Limit to top 10
-        title = article.get('title', '')
-        if title:
-            article_titles.append(title)
+    # Extract top 3 articles only
+    top_3_articles = yesterday_articles[:3]
     
-    if not article_titles:
-        print("No article titles found, skipping briefing")
+    if not top_3_articles:
+        print("No articles found, skipping briefing")
         return
     
-    print(f"Processing {len(article_titles)} article titles for briefing")
+    print(f"Processing top {len(top_3_articles)} articles for briefing")
     
-    # Generate briefing summary
-    briefing_message = generate_briefing_summary(article_titles, config)
+    # Generate briefing summary for top 3 articles
+    briefing_message = generate_briefing_summary(top_3_articles, config)
     
     if not briefing_message:
         print("Failed to generate briefing summary")
