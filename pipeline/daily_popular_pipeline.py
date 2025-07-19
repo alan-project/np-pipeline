@@ -13,7 +13,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_utc_range_of_local_yesterday(local_tz, days_back=1):
     """Return UTC time range for N days back in the specified timezone"""
-    now_local = datetime.now(local_tz)
+    # Use UTC time and convert to local timezone for consistency
+    utc_now = datetime.now(pytz.utc)
+    now_local = utc_now.astimezone(local_tz)
     target_date = now_local - timedelta(days=days_back)
 
     # Local start and end times
@@ -211,13 +213,18 @@ def send_briefing_push(title, message, country):
 def send_yesterday_briefing(daily_data, config):
     """Send briefing push for yesterday's popular articles"""
     local_tz = pytz.timezone(config["timezone"])
-    yesterday = datetime.now(local_tz) - timedelta(days=1)
+    # Use UTC time and convert to local timezone for consistency
+    utc_now = datetime.now(pytz.utc)
+    local_now = utc_now.astimezone(local_tz)
+    yesterday = local_now - timedelta(days=1)
     yesterday_key = yesterday.strftime("%Y-%m-%d")
     
     yesterday_articles = daily_data.get(yesterday_key, [])
     
     if not yesterday_articles:
         print(f"No articles found for yesterday ({yesterday_key}), skipping briefing")
+        print(f"Available dates in daily_data: {list(daily_data.keys())}")
+        print(f"Local timezone: {config['timezone']}, Current local time: {local_now.strftime('%Y-%m-%d %H:%M:%S')}")
         return
     
     # Extract top 3 articles only
@@ -275,7 +282,7 @@ def main():
     config = config_module.config
 
     print(f"Running daily popular pipeline for: {config['country']}")
-    print(f"START TIME: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    print(f"START TIME: {datetime.now(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
     # Collect popular articles from the past 7 days
     days_back = config.get("daily_popular_days", 7)
