@@ -11,22 +11,17 @@ from firebase_admin import credentials, firestore
 # Add parent directory to Python path for absolute imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def get_utc_range_of_local_yesterday(local_tz, days_back=1):
-    """Return UTC time range for N days back in the specified timezone"""
-    # Use UTC time and convert to local timezone for consistency
-    utc_now = datetime.now(pytz.utc)
-    now_local = utc_now.astimezone(local_tz)
+def get_local_date_range(local_tz, days_back=1):
+    """Return local time range for N days back in the specified timezone"""
+    # Use local timezone consistently
+    now_local = datetime.now(local_tz)
     target_date = now_local - timedelta(days=days_back)
 
     # Local start and end times
     start_local = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
     end_local = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-    # Convert to UTC
-    start_utc = start_local.astimezone(pytz.utc)
-    end_utc = end_local.astimezone(pytz.utc)
-
-    return start_utc.strftime("%Y-%m-%d %H:%M:%S"), end_utc.strftime("%Y-%m-%d %H:%M:%S")
+    return start_local.strftime("%Y-%m-%d %H:%M:%S"), end_local.strftime("%Y-%m-%d %H:%M:%S")
 
 def get_daily_popular_articles(config, days_back=7, limit=10):
     """Collect popular articles from the past N days"""
@@ -35,7 +30,7 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
     result = {}
     
     for i in range(1, days_back + 1):
-        start_str, end_str = get_utc_range_of_local_yesterday(local_tz, days_back=i)
+        start_str, end_str = get_local_date_range(local_tz, days_back=i)
         date_key = start_str.split(" ")[0]  # YYYY-MM-DD
 
         try:
@@ -65,7 +60,7 @@ def get_daily_popular_articles(config, days_back=7, limit=10):
 def save_daily_popular_to_firestore(daily_data, config):
     """Save daily popular articles to Firestore"""
     db = firestore.client()
-    utc_timezone = pytz.timezone('UTC')
+    local_tz = pytz.timezone(config["timezone"])
     country = config["country"].lower()
     collection_name = f"{country}_daily_popular"
     
@@ -77,7 +72,7 @@ def save_daily_popular_to_firestore(daily_data, config):
 
         doc = {
             'articles': articles,
-            'updated_at': datetime.now(utc_timezone),
+            'updated_at': datetime.now(local_tz),
             'count': len(articles),
             'date': date_key
         }
@@ -213,9 +208,8 @@ def send_briefing_push(title, message, country):
 def send_yesterday_briefing(daily_data, config):
     """Send briefing push for yesterday's popular articles"""
     local_tz = pytz.timezone(config["timezone"])
-    # Use UTC time and convert to local timezone for consistency
-    utc_now = datetime.now(pytz.utc)
-    local_now = utc_now.astimezone(local_tz)
+    # Use local timezone consistently
+    local_now = datetime.now(local_tz)
     yesterday = local_now - timedelta(days=1)
     yesterday_key = yesterday.strftime("%Y-%m-%d")
     
@@ -282,7 +276,8 @@ def main():
     config = config_module.config
 
     print(f"Running daily popular pipeline for: {config['country']}")
-    print(f"START TIME: {datetime.now(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    local_tz = pytz.timezone(config["timezone"])
+    print(f"START TIME: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')} {config['timezone']}")
 
     # Collect popular articles from the past 7 days
     days_back = config.get("daily_popular_days", 7)
