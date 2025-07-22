@@ -1,7 +1,7 @@
 import firebase_admin
 import os
 from firebase_admin import credentials, firestore
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 def save_to_server(data, config):
@@ -52,3 +52,58 @@ def save_article_stats(total_articles, uploaded_articles, config):
     }, merge=True)
     
     print(f"Stats saved: {date_str} {hour_str}:00 - Total: {total_articles}, Uploaded: {uploaded_articles}")
+    
+    # Check if it's 00:00 hour - calculate previous day totals
+    if hour_str == "00":
+        calculate_previous_day_totals(db, info_collection, local_time, local_tz)
+
+
+def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
+    """Calculate and save total statistics for the previous day"""
+    try:
+        # Get previous day
+        previous_day = current_time - timedelta(days=1)
+        prev_date_str = previous_day.strftime('%Y-%m-%d')
+        
+        print(f"Calculating daily totals for {prev_date_str}...")
+        
+        # Get previous day's document
+        prev_doc_ref = db.collection(info_collection).document(prev_date_str)
+        prev_doc = prev_doc_ref.get()
+        
+        if not prev_doc.exists:
+            print(f"No data found for {prev_date_str}")
+            return
+        
+        data = prev_doc.to_dict()
+        hours_data = data.get('hours', {})
+        
+        if not hours_data:
+            print(f"No hourly data found for {prev_date_str}")
+            return
+        
+        # Calculate totals
+        total_articles_sum = 0
+        uploaded_articles_sum = 0
+        
+        for hour, stats in hours_data.items():
+            total_articles_sum += stats.get('total_articles', 0)
+            uploaded_articles_sum += stats.get('uploaded_articles', 0)
+        
+        # Save daily totals in result subcollection
+        result_data = {
+            "total_articles": total_articles_sum,
+            "uploaded_articles": uploaded_articles_sum,
+            "date": prev_date_str,
+            "calculated_at": current_time
+        }
+        
+        # Save to result subcollection
+        prev_doc_ref.set({
+            "result": result_data
+        }, merge=True)
+        
+        print(f"Daily totals saved for {prev_date_str}: Total: {total_articles_sum}, Uploaded: {uploaded_articles_sum}")
+        
+    except Exception as e:
+        print(f"Error calculating previous day totals: {e}")
