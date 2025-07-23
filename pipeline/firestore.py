@@ -53,9 +53,43 @@ def save_article_stats(total_articles, uploaded_articles, config):
     
     print(f"Stats saved: {date_str} {hour_str}:00 - Total: {total_articles}, Uploaded: {uploaded_articles}")
     
-    # Check if it's 00:00 hour - calculate previous day totals
-    if hour_str == "00":
+    # Check if this is the first action of the day - calculate previous day totals
+    if is_first_action_of_day(db, info_collection, date_str, hour_str):
         calculate_previous_day_totals(db, info_collection, local_time, local_tz)
+
+
+def is_first_action_of_day(db, info_collection, date_str, current_hour_str):
+    """Check if this is the first action (hour entry) of the current day"""
+    try:
+        doc_ref = db.collection(info_collection).document(date_str)
+        doc = doc_ref.get()
+        
+        if not doc.exists:
+            print(f"DEBUG: Document for {date_str} doesn't exist yet - this is the first action")
+            return True
+        
+        data = doc.to_dict()
+        hours_data = data.get('hours', {})
+        
+        # Check if there are any hours recorded before the current hour
+        current_hour = int(current_hour_str)
+        existing_hours = [int(hour) for hour in hours_data.keys() if hour.isdigit()]
+        
+        if not existing_hours:
+            print(f"DEBUG: No existing hours for {date_str} - this is the first action")
+            return True
+        
+        # Check if current hour is the earliest hour recorded today
+        min_existing_hour = min(existing_hours)
+        is_first = current_hour <= min_existing_hour
+        
+        print(f"DEBUG: Date {date_str}, Current hour: {current_hour}, Existing hours: {sorted(existing_hours)}, Is first: {is_first}")
+        return is_first
+        
+    except Exception as e:
+        print(f"DEBUG: Error checking first action of day: {e}")
+        # If there's an error, assume it's the first action to be safe
+        return True
 
 
 def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
