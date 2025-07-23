@@ -27,7 +27,7 @@ def save_to_server(data, config):
 
 
 def save_article_stats(total_articles, uploaded_articles, config):
-    """Save article statistics to Firestore with local timezone"""
+    """Save article statistics to Firestore with local timezone and update daily totals"""
     db = firestore.client()
     info_collection = config["info_doc"]
     
@@ -53,108 +53,49 @@ def save_article_stats(total_articles, uploaded_articles, config):
     
     print(f"Stats saved: {date_str} {hour_str}:00 - Total: {total_articles}, Uploaded: {uploaded_articles}")
     
-    # Check if this is the first action of the day - calculate previous day totals
-    if is_first_action_of_day(db, info_collection, date_str, hour_str):
-        calculate_previous_day_totals(db, info_collection, local_time, local_tz)
+    # Update daily totals based on current result folder values
+    update_daily_totals(db, info_collection, date_str, total_articles, uploaded_articles)
 
 
-def is_first_action_of_day(db, info_collection, date_str, current_hour_str):
-    """Check if this is the first action (hour entry) of the current day"""
+def update_daily_totals(db, info_collection, date_str, new_total_articles, new_uploaded_articles):
+    """Update daily totals by reading existing result and adding new values"""
     try:
         doc_ref = db.collection(info_collection).document(date_str)
         doc = doc_ref.get()
         
-        if not doc.exists:
-            print(f"DEBUG: Document for {date_str} doesn't exist yet - this is the first action")
-            return True
+        # Initialize totals
+        current_total = 0
+        current_uploaded = 0
         
-        data = doc.to_dict()
-        hours_data = data.get('hours', {})
-        
-        # Check if there are any hours recorded before the current hour
-        current_hour = int(current_hour_str)
-        existing_hours = [int(hour) for hour in hours_data.keys() if hour.isdigit()]
-        
-        if not existing_hours:
-            print(f"DEBUG: No existing hours for {date_str} - this is the first action")
-            return True
-        
-        # Check if current hour is the earliest hour recorded today
-        min_existing_hour = min(existing_hours)
-        is_first = current_hour <= min_existing_hour
-        
-        print(f"DEBUG: Date {date_str}, Current hour: {current_hour}, Existing hours: {sorted(existing_hours)}, Is first: {is_first}")
-        return is_first
-        
-    except Exception as e:
-        print(f"DEBUG: Error checking first action of day: {e}")
-        # If there's an error, assume it's the first action to be safe
-        return True
-
-
-def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
-    """Calculate and save total statistics for the previous day"""
-    try:
-        # Get previous day
-        previous_day = current_time - timedelta(days=1)
-        prev_date_str = previous_day.strftime('%Y-%m-%d')
-        
-        print(f"Calculating daily totals for {prev_date_str}...")
-        
-        # Get previous day's document
-        prev_doc_ref = db.collection(info_collection).document(prev_date_str)
-        prev_doc = prev_doc_ref.get()
-        
-        if not prev_doc.exists:
-            print(f"No data found for {prev_date_str}")
-            return
-        
-        data = prev_doc.to_dict()
-        print(f"DEBUG: Document data structure: {data}")
-        
-        hours_data = data.get('hours', {})
-        print(f"DEBUG: Hours data: {hours_data}")
-        
-        if not hours_data:
-            print(f"No hourly data found for {prev_date_str}")
-            return
-        
-        # Calculate totals
-        total_articles_sum = 0
-        uploaded_articles_sum = 0
-        
-        print(f"DEBUG: Processing {len(hours_data)} hours of data...")
-        for hour, stats in hours_data.items():
-            print(f"DEBUG: Hour {hour}, Stats: {stats}")
-            print(f"DEBUG: Stats type: {type(stats)}")
+        # If document exists and has result data, read existing totals
+        if doc.exists:
+            data = doc.to_dict()
+            result_data = data.get('result', {})
             
-            if isinstance(stats, dict):
-                total_articles = stats.get('total_articles', 0)
-                uploaded_articles = stats.get('uploaded_articles', 0)
-                print(f"DEBUG: Hour {hour} - total: {total_articles}, uploaded: {uploaded_articles}")
-                total_articles_sum += total_articles
-                uploaded_articles_sum += uploaded_articles
-            else:
-                print(f"DEBUG: Hour {hour} - stats is not a dict: {stats}")
+            if result_data:
+                current_total = result_data.get('total_articles', 0)
+                current_uploaded = result_data.get('uploaded_articles', 0)
+                print(f"Found existing totals for {date_str}: Total: {current_total}, Uploaded: {current_uploaded}")
         
-        print(f"DEBUG: Final sums - Total: {total_articles_sum}, Uploaded: {uploaded_articles_sum}")
+        # Add new values to existing totals
+        updated_total = current_total + new_total_articles
+        updated_uploaded = current_uploaded + new_uploaded_articles
         
-        # Save daily totals in result subcollection
+        # Save updated totals to result
         result_data = {
-            "total_articles": total_articles_sum,
-            "uploaded_articles": uploaded_articles_sum,
-            "date": prev_date_str,
-            "calculated_at": current_time
+            "total_articles": updated_total,
+            "uploaded_articles": updated_uploaded,
+            "date": date_str,
+            "last_updated": datetime.now()
         }
         
-        # Save to result subcollection
-        prev_doc_ref.set({
+        doc_ref.set({
             "result": result_data
         }, merge=True)
         
-        print(f"Daily totals saved for {prev_date_str}: Total: {total_articles_sum}, Uploaded: {uploaded_articles_sum}")
+        print(f"Daily totals updated for {date_str}: Total: {updated_total} (+{new_total_articles}), Uploaded: {updated_uploaded} (+{new_uploaded_articles})")
         
     except Exception as e:
-        print(f"Error calculating previous day totals: {e}")
+        print(f"Error updating daily totals: {e}")
         import traceback
         print(f"DEBUG: Full traceback: {traceback.format_exc()}")
