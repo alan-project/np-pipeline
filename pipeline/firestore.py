@@ -76,7 +76,10 @@ def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
             return
         
         data = prev_doc.to_dict()
+        print(f"DEBUG: Document data structure: {data}")
+        
         hours_data = data.get('hours', {})
+        print(f"DEBUG: Hours data: {hours_data}")
         
         if not hours_data:
             print(f"No hourly data found for {prev_date_str}")
@@ -86,9 +89,21 @@ def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
         total_articles_sum = 0
         uploaded_articles_sum = 0
         
+        print(f"DEBUG: Processing {len(hours_data)} hours of data...")
         for hour, stats in hours_data.items():
-            total_articles_sum += stats.get('total_articles', 0)
-            uploaded_articles_sum += stats.get('uploaded_articles', 0)
+            print(f"DEBUG: Hour {hour}, Stats: {stats}")
+            print(f"DEBUG: Stats type: {type(stats)}")
+            
+            if isinstance(stats, dict):
+                total_articles = stats.get('total_articles', 0)
+                uploaded_articles = stats.get('uploaded_articles', 0)
+                print(f"DEBUG: Hour {hour} - total: {total_articles}, uploaded: {uploaded_articles}")
+                total_articles_sum += total_articles
+                uploaded_articles_sum += uploaded_articles
+            else:
+                print(f"DEBUG: Hour {hour} - stats is not a dict: {stats}")
+        
+        print(f"DEBUG: Final sums - Total: {total_articles_sum}, Uploaded: {uploaded_articles_sum}")
         
         # Save daily totals in result subcollection
         result_data = {
@@ -107,3 +122,5 @@ def calculate_previous_day_totals(db, info_collection, current_time, local_tz):
         
     except Exception as e:
         print(f"Error calculating previous day totals: {e}")
+        import traceback
+        print(f"DEBUG: Full traceback: {traceback.format_exc()}")
