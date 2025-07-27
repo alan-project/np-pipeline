@@ -18,21 +18,54 @@ from datetime import datetime
 
 
 def select_top_articles(articles, top_article_count, config):
+    print(f"\n**=== DEBUG: Starting article selection ===**")
+    print(f"**Total articles to choose from:** {len(articles)}")
+    print(f"**Target selection count:** {top_article_count}")
+    
+    # Check environment variables
     api_url = os.getenv("AI_URL")
-    api_key = config["api_key"]
+    print(f"**AI_URL from env:** {api_url}")
+    
+    if not api_url:
+        print("**ERROR: AI_URL environment variable is not set!**")
+        return []
+    
+    api_key = config.get("api_key")
+    print(f"**API key exists:** {bool(api_key)}")
+    print(f"**API key length:** {len(api_key) if api_key else 0}")
+    
+    if not api_key:
+        print("**ERROR: API key is missing from config!**")
+        return []
+    
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
     print(f"\n**Available articles for selection:**")
     for article in articles:
         print(f"  - ID: {article['article_id']}, Title: {article.get('title', 'No title')}")
     
-    prompt = config["top_prompt"](top_article_count) + "\n\nHere are the articles:\n\n" + \
+    # Check if top_prompt function exists
+    if "top_prompt" not in config:
+        print("**ERROR: top_prompt function not found in config!**")
+        return []
+    
+    try:
+        base_prompt = config["top_prompt"](top_article_count)
+        print(f"**Base prompt generated successfully, length:** {len(base_prompt)}")
+    except Exception as e:
+        print(f"**ERROR: Failed to generate base prompt: {e}**")
+        return []
+    
+    prompt = base_prompt + "\n\nHere are the articles:\n\n" + \
         "\n".join([
             f"Article ID: {article['article_id']}\n"
             f"Title: {article['title']}\n"
             "---"
             for article in articles
         ]) + "\n\nReturn ONLY the article IDs of the selected articles, one per line."
+    
+    print(f"**Final prompt length:** {len(prompt)}")
+    print(f"**Final prompt preview (first 500 chars):**\n{prompt[:500]}...")
     
     data = {
         "model": "gpt-4.1",
@@ -42,24 +75,83 @@ def select_top_articles(articles, top_article_count, config):
     }
 
     try:
+        print(f"\n**Making API request to:** {api_url}")
+        print(f"**Request payload:** {data}")
         response = requests.post(api_url, headers=headers, json=data)
+        print(f"**API Response Status:** {response.status_code}")
+        
         if response.status_code == 200:
-            ai_response = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
-            print(f"\n**AI Response for article selection:**\n{ai_response}")
-            content = ai_response.split("\n")
-            selected_articles = [article_id.strip() for article_id in content if article_id.strip()][:top_article_count]
-            
-            print("\n**AI selected TOP article list (removed duplicates):**")
-            for idx, article_id in enumerate(selected_articles):
-                print(f"  {idx+1}. {article_id}")
+            try:
+                response_json = response.json()
+                print(f"**API Response JSON keys:** {list(response_json.keys())}")
+                
+                choices = response_json.get("choices", [])
+                print(f"**Choices array length:** {len(choices)}")
+                
+                if not choices:
+                    print("**ERROR: No choices in API response**")
+                    return []
+                
+                message = choices[0].get("message", {})
+                print(f"**Message keys:** {list(message.keys())}")
+                
+                ai_response = message.get("content", "").strip()
+                print(f"**Raw AI Response:** '{ai_response}'")
+                print(f"**AI Response length:** {len(ai_response)}")
+                print(f"**AI Response type:** {type(ai_response)}")
+                
+                if not ai_response:
+                    print("**ERROR: AI returned empty response**")
+                    return []
+                
+                if ai_response.lower() == "none":
+                    print("**ERROR: AI explicitly returned 'none'**")
+                    return []
+                
+                print(f"\n**AI Response for article selection:**\n{ai_response}")
+                
+                # Parse response
+                content_lines = ai_response.split("\n")
+                print(f"**Split into {len(content_lines)} lines:**")
+                for i, line in enumerate(content_lines):
+                    print(f"  Line {i+1}: '{line.strip()}'")
+                
+                selected_articles = [article_id.strip() for article_id in content_lines if article_id.strip()][:top_article_count]
+                
+                print(f"**After filtering, {len(selected_articles)} articles selected:**")
+                for i, article_id in enumerate(selected_articles):
+                    print(f"  {i+1}. '{article_id}'")
+                
+                # Validate selected articles exist in original list
+                valid_ids = [article['article_id'] for article in articles]
+                print(f"**Valid article IDs:** {valid_ids}")
+                
+                validated_articles = []
+                for article_id in selected_articles:
+                    if article_id in valid_ids:
+                        validated_articles.append(article_id)
+                        print(f"  ✓ '{article_id}' is valid")
+                    else:
+                        print(f"  ✗ '{article_id}' is NOT in original list")
+                
+                print("\n**AI selected TOP article list (validated):**")
+                for idx, article_id in enumerate(validated_articles):
+                    print(f"  {idx+1}. {article_id}")
 
-            return selected_articles
+                return validated_articles
+                
+            except Exception as json_error:
+                print(f"**ERROR: Failed to parse JSON response: {json_error}**")
+                print(f"**Raw response text:** {response.text}")
+                return []
         else:
             print(f"GPT API resp fail ({response.status_code})")
-            print(response.text)
+            print(f"**Response text:** {response.text}")
             return []
     except Exception as e:
         print(f"Error in selecting top articles: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 
