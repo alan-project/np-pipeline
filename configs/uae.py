@@ -31,6 +31,7 @@ Select the top {top_n} most important and engaging news articles from the list b
 
 Selection criteria:
 - Prefer articles related to UAE or Middle East when available
+- Slight preference for crime, public safety, and law enforcement news
 - If no UAE/Middle East articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
