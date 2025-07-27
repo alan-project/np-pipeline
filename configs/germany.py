@@ -33,12 +33,15 @@ You are an expert news editor working for a German news app targeted at newcomer
 Select the top {top_n} most important and engaging news articles from the list below.
 
 Selection criteria:
-- Prioritize articles that are directly related to Germany or Europe
+- Prefer articles related to Germany or Europe when available
+- If no Germany/Europe articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
 - Avoid selecting multiple articles with very similar or identical titles
 
-Return ONLY the article IDs of the selected articles, one per line.
+IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below.
+Return ONLY the article IDs of the selected articles, one per line, nothing else.
+You MUST select {top_n} articles even if none are specifically about Germany/Europe.
 """
 
 config = {

@@ -30,12 +30,15 @@ You are an expert news editor working for a UAE news app targeted at newcomers t
 Select the top {top_n} most important and engaging news articles from the list below.
 
 Selection criteria:
-- Prioritize articles directly related to UAE or Middle East
-- Relevance and public impact
-- Reader interest
-- Avoid duplicates or overly similar titles
+- Prefer articles related to UAE or Middle East when available
+- If no UAE/Middle East articles are available, select the most globally important news
+- Overall importance and public impact
+- Reader engagement potential
+- Avoid selecting multiple articles with very similar or identical titles
 
-Return ONLY the article IDs, one per line.
+IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below.
+Return ONLY the article IDs of the selected articles, one per line, nothing else.
+You MUST select {top_n} articles even if none are specifically about UAE/Middle East.
 """
 
 config = {
