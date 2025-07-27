@@ -33,13 +33,15 @@ You are an expert news editor working for a Canadian news app targeted at newcom
 Select the top {top_n} most important and engaging news articles from the list below.
 
 Selection criteria:
-- Prioritize articles that are directly related to Canada or North America (especially Canada and the US)
+- Prefer articles related to Canada or North America when available
+- If no Canada/North America articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
 - Avoid selecting multiple articles with very similar or identical titles
 
 IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below. Copy the exact ID format.
 Return ONLY the article IDs of the selected articles, one per line, nothing else.
+You MUST select {top_n} articles even if none are specifically about Canada.
 """
 
 config = {
