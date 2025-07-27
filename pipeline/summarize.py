@@ -51,9 +51,8 @@ def generate_ai_summary(content, config):
                 return None
 
             return {
-                "category_ai": category,
                 "ai_title": title,
-                "ai_content": summary
+                "ai_summary": summary
             }
         else:
             print(f"GPT API resp fail: ({response.status_code})")
@@ -63,7 +62,7 @@ def generate_ai_summary(content, config):
 
 
 
-def translate_ai_summary(ai_title, ai_content, lang, api_key):
+def translate_ai_summary(ai_title, ai_summary, lang, api_key):
     api_url = os.getenv("AI_URL")
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -85,7 +84,7 @@ def translate_ai_summary(ai_title, ai_content, lang, api_key):
 
     user_prompt = (
         f"Title: {ai_title}\n"
-        f"Content: {ai_content}"
+        f"Content: {ai_summary}"
     )
 
     data = {
@@ -109,7 +108,7 @@ def translate_ai_summary(ai_title, ai_content, lang, api_key):
                 content = result.split("Content:")[1].strip()
                 return {
                     "ai_title": title,
-                    "ai_content": content
+                    "ai_summary": content
                 }
             else:
                 print(f"'{lang}' translation result format error")
@@ -133,15 +132,14 @@ def process_article(article, api_key):
         print(f"article ID {article['article_id']} Arabic summary fail")
         return None
 
-    article["category_ai"] = ai_summary["category_ai"]
     article["ai_title"] = ai_summary["ai_title"]
-    article["ai_content"] = ai_summary["ai_content"]
+    article["ai_summary"] = ai_summary["ai_summary"]
 
     # Translate to each language
     translations = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {
-            lang: executor.submit(translate_ai_summary, ai_summary["ai_title"], ai_summary["ai_content"], lang, api_key)
+            lang: executor.submit(translate_ai_summary, ai_summary["ai_title"], ai_summary["ai_summary"], lang, api_key)
             for lang in ["ur", "hi", "bn", "en"]
         }
         for lang, future in futures.items():
@@ -153,7 +151,7 @@ def process_article(article, api_key):
 
     translations["ar"] = {
         "ai_title": ai_summary["ai_title"],
-        "ai_content": ai_summary["ai_content"]
+        "ai_summary": ai_summary["ai_summary"]
     }
 
     article["translations"] = translations

@@ -12,31 +12,28 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-from pipeline.summarize import generate_ai_summary
 from pipeline.translate import translate_ai_summary
 from pipeline.firestore import save_to_server, save_article_stats
 from pipeline.util import get_page_articles, fetch_articles, select_top_articles
 
 def process_article(article, config, api_key):
-    content = article.get("content")
-    if not content:
-        print(f"no content: article ID {article['article_id']}")
+    title = article.get("title")
+    ai_summary = article.get("ai_summary")
+    
+    if not title:
+        print(f"no title: article ID {article['article_id']}")
         return None
-
-    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
     if not ai_summary:
-        print(f"article ID {article['article_id']} summary fail")
+        print(f"no ai_summary: article ID {article['article_id']}")
         return None
-
-    article.update(ai_summary)
 
     translations = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {
             lang: executor.submit(
                 translate_ai_summary,
-                ai_summary["ai_title"],
-                ai_summary["ai_content"],
+                title,
+                ai_summary,
                 lang,
                 {**config, "api_key": api_key}
             ) for lang in config["lang_list"]
@@ -49,8 +46,8 @@ def process_article(article, config, api_key):
             translations[lang] = result
 
     translations[config["base_lang"]] = {
-        "ai_title": ai_summary["ai_title"],
-        "ai_content": ai_summary["ai_content"]
+        "ai_title": title,
+        "ai_content": ai_summary
     }
     article["translations"] = translations
     article["clicked_cnt"] = 0
