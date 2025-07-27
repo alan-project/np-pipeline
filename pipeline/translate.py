@@ -31,9 +31,9 @@ def translate_ai_summary(title, ai_summary, lang, config):
             result = response.json().get("choices", [])[0].get("message", {}).get("content", "")
             print(f"\n[{lang.upper()} translation result] {result}")
 
-            if "Title:" in result and "Content:" in result:
-                translated_title = result.split("Title:")[1].split("Content:")[0].strip()
-                translated_summary = result.split("Content:")[1].strip()
+            if "Title:" in result and "Summary:" in result:
+                translated_title = result.split("Title:")[1].split("Summary:")[0].strip()
+                translated_summary = result.split("Summary:")[1].strip()
                 return {
                     "ai_title": translated_title,
                     "ai_content": translated_summary
