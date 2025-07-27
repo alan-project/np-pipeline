@@ -1,17 +1,11 @@
 import os
 
 summarization_prompt = """
-You're a news editor and categorization assistant. Summarize and categorize the following article.
-- Create a short, engaging Russian title (1 line max)
+You're a news summarization assistant. Summarize the following article.
 - Write a brief summary in 2~3 lines in plain Russian
-- Determine the category of the article. Choose ONLY ONE from: crime, politics, economy, culture, technology, sports, health, other
 - Use a neutral, formal tone suitable for news articles
 - Avoid casual or conversational phrases
-- Do not use the original title
-- Respond in the exact format below:
-Category: <one of above>
-Title: <your new title>
-Content: <your summary>
+- Respond with ONLY the summary content
 
 If the content is not suitable for summarization (e.g., too short, incomplete, or lacks meaning), just return: SKIP
 

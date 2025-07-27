@@ -19,24 +19,37 @@ from pipeline.util import get_page_articles, fetch_articles, select_top_articles
 
 def process_article(article, config, api_key):
     content = article.get("content")
-    if not content:
-        print(f"no content: article ID {article['article_id']}")
-        return None
+    title = article.get("title")
+    server_ai_summary = article.get("ai_summary")
 
-    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
-    if not ai_summary:
-        print(f"article ID {article['article_id']} summary fail")
+    if not title:
+        print(f"no title: article ID {article['article_id']}")
         return None
-
-    article.update(ai_summary)
+    
+    # Check if server already has ai_summary
+    if server_ai_summary:
+        print(f"article ID {article['article_id']} using existing ai_summary from server")
+        ai_content = server_ai_summary
+    else:
+        # Generate summary using AI if not available from server
+        if not content:
+            print(f"no content: article ID {article['article_id']}")
+            return None
+        
+        print(f"article ID {article['article_id']} generating new ai_summary")
+        ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
+        if not ai_summary:
+            print(f"article ID {article['article_id']} summary fail")
+            return None
+        ai_content = ai_summary["ai_content"]
 
     translations = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {
             lang: executor.submit(
                 translate_ai_summary,
-                ai_summary["ai_title"],
-                ai_summary["ai_content"],
+                title,
+                ai_content,
                 lang,
                 {**config, "api_key": api_key}
             ) for lang in config["lang_list"]
@@ -49,8 +62,8 @@ def process_article(article, config, api_key):
             translations[lang] = result
 
     translations[config["base_lang"]] = {
-        "ai_title": ai_summary["ai_title"],
-        "ai_content": ai_summary["ai_content"]
+        "ai_title": title,
+        "ai_content": ai_content
     }
     article["translations"] = translations
     article["clicked_cnt"] = 0

@@ -39,21 +39,13 @@ def generate_ai_summary(content, config):
 
             print("\nAI summary result:\n", text[:500])
 
-            # Parse results
-            category, title, summary = None, None, None
-            if "Category:" in text and "Title:" in text and "Content:" in text:
-                category = text.split("Category:")[1].split("Title:")[0].strip()
-                title = text.split("Title:")[1].split("Content:")[0].strip()
-                summary = text.split("Content:")[1].strip()
-
-            if not (category and title and summary):
-                print("summary/category parsing fail")
+            # Return the summary directly
+            if not text.strip():
+                print("summary generation fail - empty response")
                 return None
 
             return {
-                "category_ai": category,
-                "ai_title": title,
-                "ai_content": summary
+                "ai_content": text.strip()
             }
         else:
             print(f"GPT API resp fail: ({response.status_code})")
@@ -63,25 +55,15 @@ def generate_ai_summary(content, config):
 
 
 
-def translate_ai_summary(ai_title, ai_content, lang, api_key):
-    api_url = os.getenv("AI_URL")
+def translate_ai_summary(ai_title, ai_content, lang, config):
+    api_url = "https://api.openai.com/v1/chat/completions"
+    api_key = config["api_key"]
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     
-    system_prompt = (
-        f"You are a professional news translator. Translate the following Arabic news title and summary "
-        f"into {lang}.\n"
-        f"- Translate all proper nouns such as names, locations, or organizations into {lang} unless they are internationally recognized and commonly used in Arabic.\n"
-        f"- For the title, translate naturally in {lang} and keep it short and concise.\n"
-        f"- Maintain a neutral, objective tone suitable for news articles.\n"
-        f"- Use formal language and avoid conversational tone.\n"
-        f"- Do not add any extra comments or labels.\n\n"
-        f"Return your response in this format:\n"
-        f"Title: <translated title>\n"
-        f"Content: <translated summary>"
-    )
+    system_prompt = config["translation_prompt"](lang)
 
     user_prompt = (
         f"Title: {ai_title}\n"
@@ -120,29 +102,38 @@ def translate_ai_summary(ai_title, ai_content, lang, api_key):
     return None
 
 
-def process_article(article, api_key):
+def process_article(article, config, api_key):
     content = article.get("content")
+    title = article.get("title")
+    server_ai_summary = article.get("ai_summary")
 
-    if not content:
-        print(f"no content: article ID {article['article_id']} ")
+    if not title:
+        print(f"no title: article ID {article['article_id']} ")
         return None
     
-    # Generate English summary using AI
-    ai_summary = generate_ai_summary(content, api_key)
-    if not ai_summary:
-        print(f"article ID {article['article_id']} Arabic summary fail")
-        return None
-
-    article["category_ai"] = ai_summary["category_ai"]
-    article["ai_title"] = ai_summary["ai_title"]
-    article["ai_content"] = ai_summary["ai_content"]
+    # Check if server already has ai_summary
+    if server_ai_summary:
+        print(f"article ID {article['article_id']} using existing ai_summary from server")
+        ai_content = server_ai_summary
+    else:
+        # Generate summary using AI if not available from server
+        if not content:
+            print(f"no content: article ID {article['article_id']} ")
+            return None
+        
+        print(f"article ID {article['article_id']} generating new ai_summary")
+        ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
+        if not ai_summary:
+            print(f"article ID {article['article_id']} summary fail")
+            return None
+        ai_content = ai_summary["ai_content"]
 
     # Translate to each language
     translations = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {
-            lang: executor.submit(translate_ai_summary, ai_summary["ai_title"], ai_summary["ai_content"], lang, api_key)
-            for lang in ["ur", "hi", "bn", "en"]
+            lang: executor.submit(translate_ai_summary, title, ai_content, lang, config)
+            for lang in config["lang_list"]
         }
         for lang, future in futures.items():
             result = future.result()
@@ -151,14 +142,12 @@ def process_article(article, api_key):
                 return None
             translations[lang] = result
 
-    translations["ar"] = {
-        "ai_title": ai_summary["ai_title"],
-        "ai_content": ai_summary["ai_content"]
+    translations[config["base_lang"]] = {
+        "ai_title": title,
+        "ai_content": ai_content
     }
 
     article["translations"] = translations
-    
-    
     article["clicked_cnt"] = 0
 
     print(f"article ID {article['article_id']} translation is done and stored")
