@@ -34,7 +34,6 @@ Select the top {top_n} most important and engaging news articles from the list b
 
 Selection criteria:
 - Prefer articles related to Germany or Europe when available
-- Slight preference for crime, public safety, and law enforcement news
 - If no Germany/Europe articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
