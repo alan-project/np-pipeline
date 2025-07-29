@@ -117,26 +117,24 @@ def process_article(article, config, api_key):
         print(f"no title: article ID {article['article_id']} ")
         return None
     
-    # Check if server already has ai_summary
+    # Always generate AI category, regardless of server ai_summary
+    if not content:
+        print(f"no content: article ID {article['article_id']} ")
+        return None
+    
+    print(f"article ID {article['article_id']} generating AI category and summary")
+    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
+    if not ai_summary:
+        print(f"article ID {article['article_id']} AI processing fail")
+        return None
+    
+    ai_content = ai_summary["ai_content"]
+    ai_category = ai_summary["category_ai"]
+    
+    # Use server ai_summary if available, otherwise use AI generated summary
     if server_ai_summary:
-        print(f"article ID {article['article_id']} using existing ai_summary from server")
+        print(f"article ID {article['article_id']} using server summary but AI category")
         ai_content = server_ai_summary
-        # Use original title from server
-        # Note: When using server ai_summary, we don't have AI-generated category
-        # so we keep the original server category
-    else:
-        # Generate summary using AI if not available from server
-        if not content:
-            print(f"no content: article ID {article['article_id']} ")
-            return None
-        
-        print(f"article ID {article['article_id']} generating new ai_summary")
-        ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
-        if not ai_summary:
-            print(f"article ID {article['article_id']} summary fail")
-            return None
-        ai_content = ai_summary["ai_content"]
-        ai_category = ai_summary["category_ai"]
 
     # Translate to each language using original title
     translations = {}
@@ -161,9 +159,7 @@ def process_article(article, config, api_key):
     article["clicked_cnt"] = 0
     
     # Add AI category to article (overriding server category)
-    if 'ai_category' in locals():
-        article["category"] = ai_category
-        article["category_ai"] = ai_category
+    article["category"] = ai_category
 
     print(f"article ID {article['article_id']} translation is done and stored")
     return article
