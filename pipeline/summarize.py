@@ -118,6 +118,7 @@ def process_article(article, config, api_key):
         return None
     
     # Always generate AI category, regardless of server ai_summary
+    print(f"article ID {article['article_id']} content check: {bool(content)}")
     if not content:
         print(f"no content: article ID {article['article_id']} ")
         return None
