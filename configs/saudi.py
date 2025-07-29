@@ -39,7 +39,7 @@ config = {
     "base_lang": "ar",
     "lang_list": ["ur", "hi", "bn", "en"],
     "select_all": False,
-    "top_article_ratio": 0.2,
+    "top_article_ratio": 0.1,
     "timezone": "Asia/Riyadh",
     "daily_popular_days": 2,
     "daily_popular_limit": 10,
