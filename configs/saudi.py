@@ -1,17 +1,7 @@
 import os
+from .common_prompts import summarization_prompt_with_category
 
-summarization_prompt = """
-You're a news summarization assistant. Summarize the following article.
-- Write a brief summary in 2~3 lines in plain Arabic
-- Use a neutral, formal tone suitable for news articles
-- Avoid casual or conversational phrases
-- Respond with ONLY the summary content
-
-If the content is not suitable for summarization (e.g., too short, incomplete, or lacks meaning), just return: SKIP
-
-Article:
-{content}
-"""
+summarization_prompt = summarization_prompt_with_category('Arabic')
 
 def translation_prompt(lang):
     return f"""
