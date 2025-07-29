@@ -26,22 +26,25 @@ def process_article(article, config, api_key):
         print(f"no title: article ID {article['article_id']}")
         return None
     
-    # Check if server already has ai_summary
+    # Always generate AI category, regardless of server ai_summary
+    print(f"article ID {article['article_id']} content check: {bool(content)}")
+    if not content:
+        print(f"no content: article ID {article['article_id']}")
+        return None
+    
+    print(f"article ID {article['article_id']} generating AI category and summary")
+    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
+    if not ai_summary:
+        print(f"article ID {article['article_id']} AI processing fail")
+        return None
+    
+    ai_content = ai_summary["ai_content"]
+    ai_category = ai_summary["category_ai"]
+    
+    # Use server ai_summary if available, otherwise use AI generated summary
     if server_ai_summary:
-        print(f"article ID {article['article_id']} using existing ai_summary from server")
+        print(f"article ID {article['article_id']} using server summary but AI category")
         ai_content = server_ai_summary
-    else:
-        # Generate summary using AI if not available from server
-        if not content:
-            print(f"no content: article ID {article['article_id']}")
-            return None
-        
-        print(f"article ID {article['article_id']} generating new ai_summary")
-        ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
-        if not ai_summary:
-            print(f"article ID {article['article_id']} summary fail")
-            return None
-        ai_content = ai_summary["ai_content"]
 
     translations = {}
     with ThreadPoolExecutor(max_workers=5) as executor:
@@ -67,6 +70,10 @@ def process_article(article, config, api_key):
     }
     article["translations"] = translations
     article["clicked_cnt"] = 0
+    
+    # Add AI category to article (overriding server category)
+    article["category"] = ai_category
+    print(f"article ID {article['article_id']} AI category: {ai_category}")
 
     print(f"article ID {article['article_id']} processed")
     return article
