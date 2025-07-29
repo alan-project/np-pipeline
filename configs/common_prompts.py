@@ -20,7 +20,9 @@ def summarization_prompt_with_category(language):
     ]
     
     return f"""You're a news editor and categorization assistant. Summarize and categorize the following article.
-- Write a brief summary in 2~3 lines in plain {language}
+- Write a concise summary in plain {language} that captures the key points and important facts
+- Adjust the length based on the article's content (1-4 lines maximum)
+- Include essential details like who, what, when, where if relevant
 - Determine the category of the article. Choose ONLY ONE from: {', '.join(categories)}
 - Use a neutral, formal tone suitable for news articles
 - Avoid casual or conversational phrases
