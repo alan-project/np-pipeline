@@ -160,6 +160,7 @@ def process_article(article, config, api_key):
     
     # Add AI category to article (overriding server category)
     article["category"] = ai_category
+    print(f"article ID {article['article_id']} AI category: {ai_category}")
 
     print(f"article ID {article['article_id']} translation is done and stored")
     return article
