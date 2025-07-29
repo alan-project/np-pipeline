@@ -73,8 +73,8 @@ def process_article(article, config, api_key):
     article["translations"] = translations
     article["clicked_cnt"] = 0
     
-    # Add AI category to article (overriding server category)
-    article["category"] = ai_category
+    # Add AI category to article as list (overriding server category)
+    article["category"] = [ai_category]
     print(f"article ID {article['article_id']} AI category: {ai_category}")
 
     print(f"article ID {article['article_id']} processed")
