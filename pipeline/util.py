@@ -7,6 +7,7 @@ import re
 from firebase_admin import credentials, firestore
 from enum import Enum
 from datetime import datetime
+import importlib
 
 # Config-driven approach - no hardcoded values
         
@@ -197,6 +198,9 @@ def fetch_articles(api_url, api_key, config):
             print(f"  - {article['title']} (ID: {article['article_id']})")
 
     print("\n**Translating and storing to Firebase...**")
+    # Force reload the news_pipeline module to get latest changes
+    from . import news_pipeline
+    importlib.reload(news_pipeline)
     from .news_pipeline import process_article
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = [executor.submit(process_article, article, config, api_key) for article in selected_articles]

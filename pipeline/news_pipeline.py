@@ -18,9 +18,11 @@ from pipeline.firestore import save_to_server, save_article_stats
 from pipeline.util import get_page_articles, fetch_articles, select_top_articles
 
 def process_article(article, config, api_key):
+    print(f"=== PROCESS_ARTICLE CALLED: {article.get('article_id')} ===")
     content = article.get("content")
     title = article.get("title")
     server_ai_summary = article.get("ai_summary")
+    print(f"Article data: title={bool(title)}, content={bool(content)}, server_ai_summary={bool(server_ai_summary)}")
 
     if not title:
         print(f"no title: article ID {article['article_id']}")
