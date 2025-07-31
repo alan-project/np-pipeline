@@ -62,7 +62,7 @@ def generate_ai_summary(content, config):
 
 
 def translate_ai_summary(ai_title, ai_content, lang, config):
-    api_url = "https://api.openai.com/v1/chat/completions"
+    api_url = os.getenv("AI_URL")
     api_key = config["api_key"]
     headers = {
         "Authorization": f"Bearer {api_key}",
