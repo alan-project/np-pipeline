@@ -14,7 +14,7 @@ def generate_ai_summary(content, config):
     prompt = config["summarization_prompt"].format(content=content)
 
     data = {
-        "model": "gpt-4.1-mini",
+        "model": "gpt-4o-mini",
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 1000,
         "temperature": 0.5
