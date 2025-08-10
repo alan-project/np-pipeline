@@ -135,7 +135,7 @@ Return exactly 3 shortened phrases, one per line.
 """
     
     data = {
-        "model": "gpt-5-mini",
+        "model": "gpt-4o-mini",
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 150,
         "temperature": 0.3
