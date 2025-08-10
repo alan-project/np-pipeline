@@ -137,7 +137,8 @@ Return exactly 3 shortened phrases, one per line.
     data = {
         "model": "gpt-5-mini",
         "messages": [{"role": "user", "content": prompt}],
-        "max_completion_tokens": 150
+        "max_completion_tokens": 150,
+        "temperature": 0.3
     }
     
     print("Sending request to AI API...")
