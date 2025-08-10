@@ -21,7 +21,7 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_tokens": 1024,
+        "max_completion_tokens": 1024,
         "temperature": 0.3
     }
 

@@ -71,7 +71,7 @@ def select_top_articles(articles, top_article_count, config):
     data = {
         "model": "gpt-5",
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 400,
+        "max_completion_tokens": 400,
         "temperature": 0.3
     }
 

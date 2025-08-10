@@ -16,7 +16,7 @@ def generate_ai_summary(content, config):
     data = {
         "model": "gpt-5-mini",
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 1000,
+        "max_completion_tokens": 1000,
         "temperature": 0.5
     }
 
