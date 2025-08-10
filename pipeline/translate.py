@@ -27,8 +27,24 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
     try:
         response = requests.post(api_url, headers=headers, json=data)
         if response.status_code == 200:
-            result = response.json().get("choices", [])[0].get("message", {}).get("content", "")
+            response_data = response.json()
+            message = response_data.get("choices", [])[0].get("message", {})
+            
+            # Check for refusal first
+            refusal = message.get("refusal")
+            if refusal:
+                print(f"\n[{lang.upper()} translation refused] {refusal}")
+                return None
+            
+            result = message.get("content", "")
             print(f"\n[{lang.upper()} translation result] {result}")
+            print(f"[{lang.upper()} result length] {len(result)}")
+            print(f"[{lang.upper()} result type] {type(result)}")
+            
+            # Check if result is empty
+            if not result or not result.strip():
+                print(f"[{lang.upper()} translation] Empty response from API")
+                return None
 
             if "Title:" in result and "Content:" in result:
                 title = result.split("Title:")[1].split("Content:")[0].strip()
@@ -38,9 +54,11 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
                     "ai_content": content
                 }
             else:
-                print(f"'{lang}' translation result format error")
+                print(f"'{lang}' translation result format error - missing Title: or Content:")
+                print(f"'{lang}' raw result: '{result[:200]}...'")
         else:
             print(f"translation fail ({lang}): Status {response.status_code}")
+            print(f"Response: {response.text}")
     except Exception as e:
         print(f"error on translation ({lang}): {e}")
     return None
