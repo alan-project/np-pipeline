@@ -16,7 +16,7 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
     user_prompt = f"Title: {ai_title}\nContent: {ai_content}"
 
     data = {
-        "model": "gpt-4.1-mini",
+        "model": "gpt-5-mini",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
