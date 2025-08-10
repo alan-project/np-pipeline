@@ -42,7 +42,7 @@ config = {
     "base_lang": "de",
     "lang_list": ["en", "ar", "ro","tr", "ru"],
     "select_all": False,
-    "top_article_ratio": 0.08,
+    "top_article_ratio": 0.15,
     "timezone": "Europe/Berlin",
     "daily_popular_days": 2,
     "daily_popular_limit": 10,
