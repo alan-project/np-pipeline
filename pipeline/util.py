@@ -69,7 +69,7 @@ def select_top_articles(articles, top_article_count, config):
     try:
         print(f"\n**Making API request to Gemini**")
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt
         )
         

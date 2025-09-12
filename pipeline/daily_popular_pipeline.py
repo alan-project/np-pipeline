@@ -138,7 +138,7 @@ Return exactly 3 shortened phrases, one per line.
     print("Sending request to Gemini API...")
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt
         )
         

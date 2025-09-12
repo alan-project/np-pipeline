@@ -18,7 +18,7 @@ def generate_ai_summary(content, config):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash-exp",
+            model="gemini-2.5-flash-lite",
             contents=prompt
         )
         
