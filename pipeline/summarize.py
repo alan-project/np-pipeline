@@ -17,11 +17,7 @@ def generate_ai_summary(content, config):
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=prompt,
-            config=genai.GenerationConfig(
-                max_output_tokens=1000,
-                temperature=0.5
-            )
+            contents=prompt
         )
         
         text = response.text.strip()

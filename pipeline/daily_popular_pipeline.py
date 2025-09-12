@@ -137,11 +137,7 @@ Return exactly 3 shortened phrases, one per line.
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=prompt,
-            config=genai.GenerationConfig(
-                max_output_tokens=150,
-                temperature=0.3
-            )
+            contents=prompt
         )
         
         result = response.text.strip()

@@ -20,11 +20,7 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=full_prompt,
-            config=genai.GenerationConfig(
-                max_output_tokens=1024,
-                temperature=0.3
-            )
+            contents=full_prompt
         )
         
         result = response.text.strip()

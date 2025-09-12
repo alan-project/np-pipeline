@@ -68,11 +68,7 @@ def select_top_articles(articles, top_article_count, config):
         print(f"\n**Making API request to Gemini**")
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=prompt,
-            config=genai.GenerationConfig(
-                max_output_tokens=400,
-                temperature=0.3
-            )
+            contents=prompt
         )
         
         ai_response = response.text.strip()
