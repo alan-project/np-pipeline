@@ -26,7 +26,7 @@ jobs:
 
       - name: Run news pipeline for Germany
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           AI_URL: ${{ secrets.AI_URL }}
           NEWS_API_URL: ${{ secrets.GERMANY_API_URL }}
           FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
