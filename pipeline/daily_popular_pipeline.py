@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import pytz
 import firebase_admin
 from firebase_admin import credentials, firestore
+from google import genai
 
 # Add parent directory to Python path for absolute imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -90,20 +91,18 @@ def generate_briefing_summary(top_articles, config):
     """Generate a briefing summary from top 3 articles using AI"""
     print(f"Starting briefing summary generation for {len(top_articles)} articles")
     
-    api_url = os.getenv("AI_URL")
-    api_key = config.get("api_key") or os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
+    # Initialize Gemini client
+    api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
     
-    if not api_url or not api_key:
-        print("ERROR: AI_URL or API_KEY not found, skipping briefing")
+    if not api_key:
+        print("ERROR: GEMINI_API_KEY not found, skipping briefing")
         return None
     
-    print(f"Using AI API URL: {api_url}")
     print(f"API key configured: {'Yes' if api_key else 'No'}")
     
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
+    # Set up Gemini client
+    os.environ["GOOGLE_API_KEY"] = api_key
+    client = genai.Client()
     
     # Create article list with titles
     articles_text = ""
@@ -134,44 +133,38 @@ Housing approach causes community friction
 Return exactly 3 shortened phrases, one per line.
 """
     
-    data = {
-        "model": "gpt-4.1-mini",
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 150,
-        "temperature": 0.3
-    }
-    
-    print("Sending request to AI API...")
+    print("Sending request to Gemini API...")
     try:
-        response = requests.post(api_url, headers=headers, json=data)
-        print(f"AI API response status: {response.status_code}")
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=genai.GenerationConfig(
+                max_output_tokens=150,
+                temperature=0.3
+            )
+        )
         
-        if response.status_code == 200:
-            result = response.json().get("choices", [])[0].get("message", {}).get("content", "").strip()
-            print(f"AI generated briefing: '{result}'")
-            print(f"Briefing length: {len(result)} characters")
-            
-            # Convert to numbered list - expect exactly 3 lines
-            events = [event.strip() for event in result.split('\n') if event.strip()]
-            
-            # Ensure we have exactly 3 events
-            if len(events) < 3:
-                print(f"Warning: Expected 3 events but got {len(events)}")
-                # Pad with empty if needed
-                while len(events) < 3:
-                    events.append("news update")
-            elif len(events) > 3:
-                events = events[:3]  # Take only first 3
-            
-            numbered_events = [f"{i+1}. {event}" for i, event in enumerate(events)]
-            final_result = ", ".join(numbered_events)
-            
-            print(f"Numbered briefing (3 items): '{final_result}'")
-            return final_result
-        else:
-            print(f"AI API failed with status {response.status_code}")
-            print(f"Response text: {response.text}")
-            return None
+        result = response.text.strip()
+        print(f"AI generated briefing: '{result}'")
+        print(f"Briefing length: {len(result)} characters")
+        
+        # Convert to numbered list - expect exactly 3 lines
+        events = [event.strip() for event in result.split('\n') if event.strip()]
+        
+        # Ensure we have exactly 3 events
+        if len(events) < 3:
+            print(f"Warning: Expected 3 events but got {len(events)}")
+            # Pad with empty if needed
+            while len(events) < 3:
+                events.append("news update")
+        elif len(events) > 3:
+            events = events[:3]  # Take only first 3
+        
+        numbered_events = [f"{i+1}. {event}" for i, event in enumerate(events)]
+        final_result = ", ".join(numbered_events)
+        
+        print(f"Numbered briefing (3 items): '{final_result}'")
+        return final_result
     except Exception as e:
         print(f"ERROR generating briefing summary: {e}")
         import traceback

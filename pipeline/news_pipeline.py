@@ -89,9 +89,9 @@ def main():
     country = sys.argv[1].lower()
 
     # Load security keys from environment variables
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set.")
+        raise ValueError("GEMINI_API_KEY is not set.")
     
     firebase_cred_path = os.getenv("FIREBASE_CREDENTIAL_PATH")
     if not firebase_cred_path:
