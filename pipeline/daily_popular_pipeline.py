@@ -100,7 +100,9 @@ def generate_briefing_summary(top_articles, config):
     
     print(f"API key configured: {'Yes' if api_key else 'No'}")
     
-    # Set up Gemini client
+    # Set up Gemini client (remove duplicate key to avoid warnings)
+    if "GOOGLE_API_KEY" in os.environ and os.environ["GOOGLE_API_KEY"] != api_key:
+        del os.environ["GOOGLE_API_KEY"]
     os.environ["GOOGLE_API_KEY"] = api_key
     client = genai.Client()
     

@@ -33,7 +33,9 @@ def select_top_articles(articles, top_article_count, config):
         print("**ERROR: GEMINI_API_KEY is missing from config or environment!**")
         return []
     
-    # Set up Gemini client
+    # Set up Gemini client (remove duplicate key to avoid warnings)
+    if "GOOGLE_API_KEY" in os.environ and os.environ["GOOGLE_API_KEY"] != api_key:
+        del os.environ["GOOGLE_API_KEY"]
     os.environ["GOOGLE_API_KEY"] = api_key
     client = genai.Client()
 

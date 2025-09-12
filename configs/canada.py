@@ -29,9 +29,15 @@ Selection criteria:
 - Reader engagement potential
 - Avoid selecting multiple articles with very similar or identical titles
 
-IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below. Copy the exact ID format.
-Return ONLY the article IDs of the selected articles, one per line, nothing else.
-You MUST select {top_n} articles even if none are specifically about Canada.
+CRITICAL: You must copy EXACTLY the Article ID as shown below. Do NOT modify, shorten, or change any characters.
+- Copy the entire ID string character by character
+- Double-check each ID before including it in your response
+- Return ONLY the article IDs, one per line, no additional text
+- You MUST select exactly {top_n} articles
+
+Example format:
+eaf5dbb6c306b8ab5f539ed210b18958
+a153b83d4640740c93766d23dbafcd67
 """
 
 config = {
