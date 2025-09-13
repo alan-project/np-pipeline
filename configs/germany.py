@@ -6,7 +6,11 @@ summarization_prompt = summarization_prompt_with_category('German')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following German news title and summary into {lang}.
-- Keep proper nouns (like names, locations, or organizations) in German within parentheses in the summary.
+- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original German in parentheses.
+  Example: If translating to English: German Chancellor Olaf Scholz(Olaf Scholz)
+  Example: If translating to Arabic: المستشار الألماني أولاف شولتز(Olaf Scholz)
+  Example: If translating to Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz)
+  Example: If translating to Russian: Канцлер Германии Олаф Шольц(Olaf Scholz)
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.

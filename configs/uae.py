@@ -6,10 +6,17 @@ summarization_prompt = summarization_prompt_with_category('Arabic')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following Arabic news title and summary into {lang}.
-- Translate proper nouns unless globally recognized in Arabic
-- Title must be short and natural in {lang}
-- Use neutral and formal tone
-- Respond ONLY in the following format:
+- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original Arabic in parentheses.
+  Example: If translating to Urdu: متحدہ عرب امارات کے صدر شیخ محمد بن زاید(محمد بن زايد)
+  Example: If translating to Hindi: यूएई के राष्ट्रपति शेख मोहम्मद बिन जायद(محمد بن زايد)
+  Example: If translating to Malayalam: യുഎഇ പ്രസിഡന്റ് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്(محمد بن زايد)
+  Example: If translating to English: UAE President Sheikh Mohammed bin Zayed(محمد بن زايد)
+- For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
+- Maintain a neutral, objective tone suitable for news articles.
+- Use formal language and avoid conversational tone.
+- Do not add any extra comments or labels.
+
+Return your response in this format:
 Title: <translated title>
 Content: <translated summary>
 """

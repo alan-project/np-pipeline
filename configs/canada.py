@@ -6,7 +6,11 @@ summarization_prompt = summarization_prompt_with_category('English')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following English news title and summary into {lang}.
-- Keep proper nouns (like names, locations, or organizations) in English within parentheses in the summary.
+- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original English in parentheses.
+  Example: If translating to Korean: 캐나다 총리 저스틴 트뤼도(Justin Trudeau)
+  Example: If translating to Hindi: कनाडा के प्रधानमंत्री जस्टिन ट्रूडो(Justin Trudeau)
+  Example: If translating to Chinese: 加拿大总理贾斯汀·特鲁多(Justin Trudeau)
+  Example: If translating to Arabic: رئيس وزراء كندا جاستن ترودو(Justin Trudeau)
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.

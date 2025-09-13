@@ -6,7 +6,11 @@ summarization_prompt = summarization_prompt_with_category('Russian')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following Russian news title and summary into {lang}.
-- Keep proper nouns (like names, locations, or organizations) in Russian within parentheses in the summary.
+- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original Russian in parentheses.
+  Example: If translating to English: Russian President Vladimir Putin(Владимир Путин)
+  Example: If translating to Ukrainian: Президент Росії Володимир Путін(Владимир Путин)
+  Example: If translating to Tajik: Президенти Русия Владимир Путин(Владимир Путин)
+  Example: If translating to Uzbek: Rossiya prezidenti Vladimir Putin(Владимир Путин)
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
