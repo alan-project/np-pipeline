@@ -1,14 +1,13 @@
-# .github/workflows/uae-push-notification.yml
-name: UAE - Push Notification Pipeline
+# .github/workflows/saudi-push-notification.yml
+name: Saudi Arabia - Push Notification Pipeline
 
 on:
   # Scheduled execution is commented out for now
   # schedule:
-  #   # Run at 12:00 PM and 6:00 PM UAE time (UTC+4)
-  #   # 12:00 PM UAE = 08:00 UTC
-  #   # 6:00 PM UAE = 14:00 UTC
-  #   - cron: '0 8 * * *'   # 12:00 PM UAE time
-  #   - cron: '0 14 * * *'  # 6:00 PM UAE time
+  #   # Run at 12:00 PM and 6:00 PM Saudi Arabia Time (UTC+3)
+  #   # 12:00 PM AST = 09:00 UTC, 6:00 PM AST = 15:00 UTC
+  #   - cron: '0 9 * * *'   # 12:00 PM Saudi Arabia Time
+  #   - cron: '0 15 * * *'  # 6:00 PM Saudi Arabia Time
   workflow_dispatch:
     inputs:
       hours_back:
@@ -36,12 +35,12 @@ jobs:
       - name: Restore Firebase credential JSON
         run: echo "${{ secrets.FIREBASE_CREDENTIAL_JSON }}" | base64 -d > serviceAccountKey.json
 
-      - name: Run push notification pipeline for UAE
+      - name: Run push notification pipeline for Saudi Arabia
         env:
           FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
           FIREBASE_FUNCTION_URL: ${{ secrets.FIREBASE_FUNCTION_URL }}
-          NEWS_API_URL: ${{ secrets.UAE_API_URL }}
+          NEWS_API_URL: ${{ secrets.SAUDI_API_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           hours_back="${{ github.event.inputs.hours_back || '6' }}"
-          python pipeline/push_notification_pipeline.py uae $hours_back
+          python pipeline/push_notification_pipeline.py saudi $hours_back
