@@ -233,7 +233,7 @@ def send_yesterday_briefing(daily_data, config):
     # push_title = f"Yesterday's News ({yesterday_date})"
     push_title = f"Quick News Recap"
     # Add prefix to the briefing message
-    final_message = f"Don't miss the updates: {briefing_message}"
+    final_message = f"{briefing_message}"
     
     country_code = config["country"].lower()
     if country_code == "saudi":
