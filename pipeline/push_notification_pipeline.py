@@ -44,15 +44,25 @@ def get_most_popular_article(config, hours_back=DEFAULT_HOURS_BACK):
             .stream()
 
         articles = []
+        doc_ids = []
         for doc in snapshot:
             data = doc.to_dict()
             if 'article_id' not in data:
                 data['article_id'] = doc.id
             articles.append(data)
+            doc_ids.append(doc.id)
 
         if articles:
             article = articles[0]
+            doc_id = doc_ids[0]
             print(f"Found most popular article: {article.get('title', 'No title')} (clicks: {article.get('clicked_cnt', 0)})")
+            print(f"📊 Article debug info:")
+            print(f"   - Collection: {config['firestore_collection']}")
+            print(f"   - Document ID: {doc_id}")
+            print(f"   - article_id field: {article.get('article_id', 'MISSING')}")
+            print(f"   - id field: {article.get('id', 'MISSING')}")
+            print(f"   - pubDate: {article.get('pubDate', 'MISSING')}")
+            print(f"   - All keys in article: {list(article.keys())}")
             return article
         else:
             print(f"No articles found in the specified time range for {config['country']}")
@@ -65,10 +75,10 @@ def get_most_popular_article(config, hours_back=DEFAULT_HOURS_BACK):
 def send_push_notification(article_id, country_code):
     """Send push notification via Firebase function"""
 
-    # Convert country names to country codes if needed
+    # Convert country names to country codes matching Firebase function
     country_code_mapping = {
         'saudi': 'sa',
-        'uae': 'ae',  # assuming ae for UAE
+        'uae': 'ae',
         'canada': 'ca',
         'germany': 'de',
         'russia': 'ru'
@@ -88,21 +98,31 @@ def send_push_notification(article_id, country_code):
     }
 
     try:
-        print(f"Sending push notification for article {article_id} to {final_country_code}")
-        print(f"Payload: {json.dumps(payload, indent=2)}")
+        print(f"🚀 Sending push notification:")
+        print(f"   - Firebase Function URL: {FIREBASE_FUNCTION_URL}")
+        print(f"   - Article ID: {article_id}")
+        print(f"   - Country Code: {final_country_code}")
+        print(f"   - Original Country: {country_code}")
+        print(f"   - Headers: {json.dumps(headers, indent=2)}")
+        print(f"   - Payload: {json.dumps(payload, indent=2)}")
 
         response = requests.post(FIREBASE_FUNCTION_URL, headers=headers, json=payload)
 
+        print(f"📡 Firebase Function Response:")
+        print(f"   - Status Code: {response.status_code}")
+        print(f"   - Response Headers: {dict(response.headers)}")
+        print(f"   - Response Text: {response.text}")
+
         if response.status_code == 200:
             result = response.json()
-            print(f"Push notification sent successfully!")
-            print(f"Success count: {result.get('successCount', 0)}")
-            print(f"Failure count: {result.get('failureCount', 0)}")
-            print(f"Ignored users: {result.get('ignoredUsers', 0)}")
+            print(f"✅ Push notification sent successfully!")
+            print(f"   - Success count: {result.get('successCount', 0)}")
+            print(f"   - Failure count: {result.get('failureCount', 0)}")
+            print(f"   - Ignored users: {result.get('ignoredUsers', 0)}")
             return True
         else:
-            print(f"Failed to send push notification: {response.status_code}")
-            print(f"Response: {response.text}")
+            print(f"❌ Failed to send push notification: {response.status_code}")
+            print(f"   - Error response: {response.text}")
             return False
     except Exception as e:
         print(f"Error sending push notification: {e}")
