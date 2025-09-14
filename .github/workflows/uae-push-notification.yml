@@ -1,0 +1,46 @@
+# .github/workflows/uae-push-notification.yml
+name: UAE - Push Notification Pipeline
+
+on:
+  schedule:
+    # Run at 12:00 PM and 6:00 PM UAE time (UTC+4)
+    # 12:00 PM UAE = 08:00 UTC
+    # 6:00 PM UAE = 14:00 UTC
+    - cron: '0 8 * * *'   # 12:00 PM UAE time
+    - cron: '0 14 * * *'  # 6:00 PM UAE time
+  workflow_dispatch:
+    inputs:
+      hours_back:
+        description: 'Hours to look back for popular articles'
+        required: false
+        default: '6'
+        type: string
+
+jobs:
+  push_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Restore Firebase credential JSON
+        run: echo "${{ secrets.FIREBASE_CREDENTIAL_JSON }}" | base64 -d > serviceAccountKey.json
+
+      - name: Run push notification pipeline for UAE
+        env:
+          FIREBASE_CREDENTIAL_PATH: serviceAccountKey.json
+          FIREBASE_FUNCTION_URL: ${{ secrets.FIREBASE_FUNCTION_URL }}
+          NEWS_API_URL: ${{ secrets.UAE_API_URL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          hours_back="${{ github.event.inputs.hours_back || '6' }}"
+          python pipeline/push_notification_pipeline.py uae $hours_back
