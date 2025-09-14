@@ -3,10 +3,9 @@ name: Canada - Push Notification Pipeline
 
 on:
   schedule:
-    # Run at 12:00 PM and 6:00 PM Canada Eastern Time (UTC-5/UTC-4 depending on DST)
-    # Using UTC-5 (EST) as base: 12:00 PM EST = 17:00 UTC, 6:00 PM EST = 23:00 UTC
-    - cron: '0 17 * * *'  # 12:00 PM Canada Eastern Time
-    - cron: '0 23 * * *'  # 6:00 PM Canada Eastern Time
+    # Run at 1:00 PM, 2:00 PM, 4:00 PM, and 6:00 PM Canada Eastern Time
+    # Using UTC-5 (EST) as base: 1:00 PM EST = 18:00 UTC, 2:00 PM EST = 19:00 UTC, 4:00 PM EST = 21:00 UTC, 6:00 PM EST = 23:00 UTC
+    - cron: '0 18,19,21,23 * * *'  # 1:00 PM, 2:00 PM, 4:00 PM, and 6:00 PM Canada Eastern Time
   workflow_dispatch:
     inputs:
       hours_back:
