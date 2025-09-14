@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Configuration constants
 DEFAULT_HOURS_BACK = 6  # Hours to look back for popular articles
-FIREBASE_FUNCTION_URL = os.getenv("FIREBASE_FUNCTION_URL") or "https://sendarticlepushbylanguage-ladydgb7za-uc.a.run.app"
+FIREBASE_FUNCTION_URL = os.getenv("FIREBASE_FUNCTION_URL") or "https://us-central1-the-north-news.cloudfunctions.net/sendArticlePushByLanguage"
 
 def get_time_range(local_tz, hours_back=DEFAULT_HOURS_BACK):
     """Return local time range for N hours back in the specified timezone"""
@@ -75,17 +75,9 @@ def get_most_popular_article(config, hours_back=DEFAULT_HOURS_BACK):
 def send_push_notification(article_id, country_code):
     """Send push notification via Firebase function"""
 
-    # Convert country names to country codes matching Firebase function
-    country_code_mapping = {
-        'saudi': 'sa',
-        'uae': 'ae',
-        'canada': 'ca',
-        'germany': 'de',
-        'russia': 'ru'
-    }
-
-    # Use mapping if exists, otherwise use as-is
-    final_country_code = country_code_mapping.get(country_code.lower(), country_code.lower())
+    # Firebase function expects full country names, not country codes
+    # Keep the original country name
+    final_country_code = country_code.lower()
 
     payload = {
         "articleId": article_id,
