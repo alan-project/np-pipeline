@@ -81,7 +81,7 @@ def send_push_notification(article_id, country_code):
 
     payload = {
         "articleId": article_id,
-        "header": "News Platter",  # You can customize this header
+        "header": "Served Fresh: Trending News",  # You can customize this header
         "country": final_country_code
     }
 
