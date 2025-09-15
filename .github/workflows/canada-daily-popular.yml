@@ -2,7 +2,9 @@ name: Canada - Daily Popular Pipeline
 
 on:
   schedule:
-    - cron: '0 15 * * *'
+    # Run at 9:00 AM Canada Eastern Time (EDT UTC-4)
+    # 9:00 AM EDT = 13:00 UTC
+    - cron: '0 13 * * *'
   workflow_dispatch:
 
 jobs:

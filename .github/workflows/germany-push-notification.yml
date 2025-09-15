@@ -2,12 +2,10 @@
 name: Germany - Push Notification Pipeline
 
 on:
-  # Scheduled execution is commented out for now
-  # schedule:
-  #   # Run at 12:00 PM and 6:00 PM Germany Time (UTC+1/UTC+2 depending on DST)
-  #   # Using UTC+1 (CET) as base: 12:00 PM CET = 11:00 UTC, 6:00 PM CET = 17:00 UTC
-  #   - cron: '0 11 * * *'  # 12:00 PM Germany Time
-  #   - cron: '0 17 * * *'  # 6:00 PM Germany Time
+  schedule:
+    # Run at 12:00 PM and 5:00 PM Germany Time (CEST UTC+2 for summer time)
+    # 12:00 PM CEST = 10:00 UTC, 5:00 PM CEST = 15:00 UTC
+    - cron: '0 10,15 * * *'  # 12:00 PM and 5:00 PM Germany Time (CEST)
   workflow_dispatch:
     inputs:
       hours_back:
