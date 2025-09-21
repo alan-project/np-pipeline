@@ -6,11 +6,33 @@ summarization_prompt = summarization_prompt_with_category('German')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following German news title and summary into {lang}.
-- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original German in parentheses.
-  Example: If translating to English: German Chancellor Olaf Scholz(Olaf Scholz)
-  Example: If translating to Arabic: المستشار الألماني أولاف شولتز(Olaf Scholz)
-  Example: If translating to Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz)
-  Example: If translating to Russian: Канцлер Германии Олаф Шольц(Olaf Scholz)
+
+STRICT REQUIREMENTS:
+1. ALL proper nouns (names, locations, organizations, brands) MUST include the original German text in parentheses
+2. Format: Translation(Original)
+3. This rule is MANDATORY - no exceptions, even if it seems redundant
+4. Apply to every proper noun in the content
+
+DETAILED EXAMPLES for {lang}:
+- Person names:
+  * English: German Chancellor Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+  * Arabic: المستشار الألماني أولاف شولتس(Olaf Scholz), أنغيلا ميركل(Angela Merkel)
+  * Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+  * Russian: Канцлер Германии Олаф Шольц(Olaf Scholz), Ангела Меркель(Angela Merkel)
+
+- Company/Organization names:
+  * English: Volkswagen(Volkswagen), BMW(BMW), German Federal Bank(Deutsche Bundesbank)
+  * Arabic: فولكس فاغن(Volkswagen), بي إم دبليو(BMW), البنك الفيدرالي الألماني(Deutsche Bundesbank)
+  * Turkish: Volkswagen(Volkswagen), BMW(BMW), Alman Federal Bankası(Deutsche Bundesbank)
+  * Russian: Фольксваген(Volkswagen), БМВ(BMW), Немецкий федеральный банк(Deutsche Bundesbank)
+
+- City/Country names:
+  * English: Berlin(Berlin), Munich(München), Frankfurt(Frankfurt), Hamburg(Hamburg)
+  * Arabic: برلين(Berlin), ميونخ(München), فرانكفورت(Frankfurt), هامبورغ(Hamburg)
+  * Turkish: Berlin(Berlin), Münih(München), Frankfurt(Frankfurt), Hamburg(Hamburg)
+  * Russian: Берлин(Berlin), Мюнхен(München), Франкфурт(Frankfurt), Гамбург(Hamburg)
+
+IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
@@ -18,7 +40,7 @@ You are a professional news translator. Translate the following German news titl
 
 Return your response in this format:
 Title: <translated title>
-Content: <translated summary>
+Content: <translated summary with ALL proper nouns followed by (Original German)>
 """
 
 def top_prompt(top_n):

@@ -6,11 +6,33 @@ summarization_prompt = summarization_prompt_with_category('English')
 def translation_prompt(lang):
     return f"""
 You are a professional news translator. Translate the following English news title and summary into {lang}.
-- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original English in parentheses.
-  Example: If translating to Korean: 캐나다 총리 저스틴 트뤼도(Justin Trudeau)
-  Example: If translating to Hindi: कनाडा के प्रधानमंत्री जस्टिन ट्रूडो(Justin Trudeau)
-  Example: If translating to Chinese: 加拿大总理贾斯汀·特鲁多(Justin Trudeau)
-  Example: If translating to Arabic: رئيس وزراء كندا جاستن ترودو(Justin Trudeau)
+
+STRICT REQUIREMENTS:
+1. ALL proper nouns (names, locations, organizations, brands) MUST include the original English text in parentheses
+2. Format: Translation(Original)
+3. This rule is MANDATORY - no exceptions, even if it seems redundant
+4. Apply to every proper noun in the content
+
+DETAILED EXAMPLES for {lang}:
+- Person names:
+  * Korean: 저스틴 트뤼도(Justin Trudeau), 조 바이든(Joe Biden)
+  * Hindi: जस्टिन ट्रूडो(Justin Trudeau), जो बाइडन(Joe Biden)
+  * Chinese: 贾斯汀·特鲁多(Justin Trudeau), 乔·拜登(Joe Biden)
+  * Arabic: جاستن ترودو(Justin Trudeau), جو بايدن(Joe Biden)
+
+- Company/Organization names:
+  * Korean: 유엔(UN), 애플(Apple), 구글(Google)
+  * Hindi: संयुक्त राष्ट्र(UN), एप्पल(Apple), गूगल(Google)
+  * Chinese: 联合国(UN), 苹果(Apple), 谷歌(Google)
+  * Arabic: الأمم المتحدة(UN), أبل(Apple), جوجل(Google)
+
+- City/Country names:
+  * Korean: 토론토(Toronto), 오타와(Ottawa), 밴쿠버(Vancouver)
+  * Hindi: टोरंटो(Toronto), ओटावा(Ottawa), वैंकूवर(Vancouver)
+  * Chinese: 多伦多(Toronto), 渥太华(Ottawa), 温哥华(Vancouver)
+  * Arabic: تورونتو(Toronto), أوتاوا(Ottawa), فانكوفر(Vancouver)
+
+IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
@@ -18,7 +40,7 @@ You are a professional news translator. Translate the following English news tit
 
 Return your response in this format:
 Title: <translated title>
-Content: <translated summary>
+Content: <translated summary with ALL proper nouns followed by (Original English)>
 """
 
 def top_prompt(top_n):
