@@ -4,14 +4,17 @@ from .common_prompts import summarization_prompt_with_category
 summarization_prompt = summarization_prompt_with_category('Arabic')
 
 def translation_prompt(lang):
-    return f"""
+    # Check if source and target languages are the same
+    source_lang = 'ar'  # UAE's base language
+
+    # Simple logic: only skip parentheses if source and target are the same
+    if lang == source_lang:
+        return f"""
 You are a professional news translator. Translate the following Arabic news title and summary into {lang}.
-- For proper nouns (names, locations, organizations), first provide the translation or description in {lang}, then add the original Arabic in parentheses.
-  Example: If translating to Urdu: متحدہ عرب امارات کے صدر شیخ محمد بن زاید(محمد بن زايد)
-  Example: If translating to Hindi: यूएई के राष्ट्रपति शेख मोहम्मद बिन जायद(محمد بن زايد)
-  Example: If translating to Malayalam: യുഎഇ പ്രസിഡന്റ് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്(محمد بن زايد)
-  Example: If translating to English: UAE President Sheikh Mohammed bin Zayed(محمد بن زايد)
-- For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
+
+IMPORTANT: Since the source language (Arabic) and target language ({lang}) are the same, DO NOT add parentheses with original text for proper nouns.
+
+- For the title, translate naturally in {lang} but keep it short and concise.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
 - Do not add any extra comments or labels.
@@ -19,6 +22,44 @@ You are a professional news translator. Translate the following Arabic news titl
 Return your response in this format:
 Title: <translated title>
 Content: <translated summary>
+"""
+
+    return f"""
+You are a professional news translator. Translate the following Arabic news title and summary into {lang}.
+
+STRICT REQUIREMENTS:
+1. ALL proper nouns (names, locations, organizations, brands) MUST include the original Arabic text in parentheses
+2. Format: Translation(Original)
+3. This rule is MANDATORY - apply to every proper noun in the content
+
+DETAILED EXAMPLES for {lang}:
+- Person names:
+  * Urdu: متحدہ عرب امارات کے صدر شیخ محمد بن زاید(محمد بن زايد), شیخ محمد بن راشد(محمد بن راشد)
+  * Hindi: यूएई के राष्ट्रपति शेख मोहम्मद बिन जायद(محمد بن زايد), शेख मोहम्मद बिन राशिद(محمد بن راشد)
+  * Malayalam: യുഎഇ പ്രസിഡന്റ് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്(محمد بن زايد), ഷെയ്ഖ് മുഹമ്മദ് ബിൻ റാഷിദ്(محمد بن راشد)
+  * English: UAE President Sheikh Mohammed bin Zayed(محمد بن زايد), Sheikh Mohammed bin Rashid(محمد بن راشد)
+
+- Company/Organization names:
+  * Urdu: امارات ایئرلائنز(طيران الإمارات), اتصالات(اتصالات), آدنوک(أدنوك)
+  * Hindi: एमिरेट्स एयरलाइंस(طيران الإمارات), एतिसलात(اتصالات), अडनॉक(أدنوك)
+  * Malayalam: എമിറേറ്റ്സ് എയർലൈൻസ്(طيران الإمارات), എത്തിസലാത്ത്(اتصالات), അഡ്നോക്ക്(أدنوك)
+  * English: Emirates Airlines(طيران الإمارات), Etisalat(اتصالات), ADNOC(أدنوك)
+
+- City/Country names:
+  * Urdu: ابوظبی(أبوظبي), دبئی(دبي), شارجہ(الشارقة), عجمان(عجمان)
+  * Hindi: अबू धाबी(أبوظبي), दुबई(دبي), शारजाह(الشارقة), अजमान(عجمان)
+  * Malayalam: അബുദാബി(أبوظبي), ദുബായ്(دبي), ഷാർജ(الشارقة), അജ്മാൻ(عجمان)
+  * English: Abu Dhabi(أبوظبي), Dubai(دبي), Sharjah(الشارقة), Ajman(عجمان)
+
+IMPORTANT NOTES:
+- For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
+- Maintain a neutral, objective tone suitable for news articles.
+- Use formal language and avoid conversational tone.
+- Do not add any extra comments or labels.
+
+Return your response in this format:
+Title: <translated title>
+Content: <translated summary with ALL proper nouns followed by (Original Arabic)>
 """
 
 def top_prompt(top_n):
