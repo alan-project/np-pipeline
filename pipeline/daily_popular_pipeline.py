@@ -350,9 +350,9 @@ def send_yesterday_briefing(daily_data, config):
     if country_code == "saudi":
         country_code = "sa"  # Convert saudi to sa for country code
 
-    # === TEST MODE: Server transmission disabled, logging only ===
+    # Log data to be sent to server
     print("\n" + "="*60)
-    print("📤 [TEST MODE] Data preview that would be sent to server")
+    print("Data to be sent to server")
     print("="*60)
     print(f"Title: {push_title}")
     print(f"Country code: {country_code}")
@@ -362,15 +362,13 @@ def send_yesterday_briefing(daily_data, config):
         print(f"  [{lang}]: {msg}")
     print("="*60 + "\n")
 
-    # Actual server transmission is commented out for testing
-    # success = send_briefing_push(push_title, multilingual_briefing, country_code)
-    #
-    # if success:
-    #     print("Briefing push sent successfully")
-    # else:
-    #     print("Failed to send briefing push")
+    # Send push notification to server
+    success = send_briefing_push(push_title, multilingual_briefing, country_code)
 
-    print("✅ [TEST MODE] Server transmission skipped - logs only")
+    if success:
+        print("Briefing push sent successfully")
+    else:
+        print("Failed to send briefing push")
 
 def main():
     if len(sys.argv) < 2:
