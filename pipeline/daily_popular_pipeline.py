@@ -90,47 +90,51 @@ def save_daily_popular_to_firestore(daily_data, config):
 def generate_briefing_summary(top_articles, config):
     """Generate a briefing summary from top 3 articles using AI"""
     print(f"Starting briefing summary generation for {len(top_articles)} articles")
-    
+
     # Initialize Gemini client
     api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
-    
+
     if not api_key:
         print("ERROR: GEMINI_API_KEY not found, skipping briefing")
         return None
-    
+
     print(f"API key configured: {'Yes' if api_key else 'No'}")
-    
+
     # Set up Gemini client (remove duplicate key to avoid warnings)
     if "GOOGLE_API_KEY" in os.environ and os.environ["GOOGLE_API_KEY"] != api_key:
         del os.environ["GOOGLE_API_KEY"]
     os.environ["GOOGLE_API_KEY"] = api_key
     client = genai.Client()
-    
+
+    # Get base language from config
+    base_lang = config.get("base_lang", "en")
+    print(f"Generating summary in base language: {base_lang}")
+
     # Create article list with titles
     articles_text = ""
     for i, article in enumerate(top_articles, 1):
         title = article.get('title', 'No title')
         articles_text += f"Article {i}: {title}\n"
-    
+
     print(f"Top 3 articles to process:\n{articles_text}")
-    
+
     prompt = f"""
-Here are the top 3 most popular news articles from yesterday. Please shorten each title to a very brief phrase (under 8 words each) in English.
+Here are the top 3 most popular news articles from yesterday. Please shorten each title to a very brief phrase (under 8 words each) in {base_lang}.
 
 {articles_text}
 
 Requirements:
-- Write in English only
+- Write in {base_lang} only
 - Shorten each article title to under 8 words
 - Return exactly 3 lines, one for each article
 - Keep the essence of the news but make it very concise
 - Do NOT include numbering or article labels
 - Focus on the main topic/event
 
-Example output:
-Ford government releases transit emails
-Federal judge rules on funding dispute
-Housing approach causes community friction
+Example output format:
+First article summary
+Second article summary
+Third article summary
 
 Return exactly 3 shortened phrases, one per line.
 """
@@ -169,20 +173,104 @@ Return exactly 3 shortened phrases, one per line.
         print(f"Traceback: {traceback.format_exc()}")
         return None
 
-def send_briefing_push(title, message, country):
-    """Send briefing push notification via Firebase function"""
+def translate_briefing(briefing_text, target_languages, config):
+    """Translate briefing summary to multiple languages"""
+    if not target_languages:
+        print("No target languages specified, skipping translation")
+        return {}
+
+    # Initialize Gemini client
+    api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        print("ERROR: GEMINI_API_KEY not found, skipping translation")
+        return {}
+
+    print(f"Translating briefing to {len(target_languages)} languages: {', '.join(target_languages)}")
+
+    # Set up Gemini client
+    if "GOOGLE_API_KEY" in os.environ and os.environ["GOOGLE_API_KEY"] != api_key:
+        del os.environ["GOOGLE_API_KEY"]
+    os.environ["GOOGLE_API_KEY"] = api_key
+    client = genai.Client()
+
+    # Create language list string
+    lang_list_str = ", ".join(target_languages)
+
+    prompt = f"""
+Translate the following news briefing text into these languages: {lang_list_str}
+
+Original text:
+{briefing_text}
+
+IMPORTANT INSTRUCTIONS:
+- Translate the ENTIRE text including the numbering (1., 2., 3.)
+- Keep the same format and structure
+- Maintain the concise style (each item should stay brief)
+- Use professional news tone for each language
+
+Return ONLY a valid JSON object in this exact format:
+{{
+  "{target_languages[0]}": "translated text with 1., 2., 3.",
+  "{target_languages[1] if len(target_languages) > 1 else 'placeholder'}": "translated text with 1., 2., 3."
+}}
+
+Do NOT include any explanation, markdown formatting, or additional text. Only return the JSON object.
+"""
+
+    print("Sending translation request to Gemini API...")
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt
+        )
+
+        result = response.text.strip()
+        print(f"AI translation response: '{result}'")
+
+        # Parse JSON response
+        import json
+        # Remove markdown code blocks if present
+        if result.startswith("```"):
+            result = result.split("```")[1]
+            if result.startswith("json"):
+                result = result[4:]
+            result = result.strip()
+
+        translations = json.loads(result)
+        print(f"Successfully translated to {len(translations)} languages")
+        return translations
+
+    except Exception as e:
+        print(f"ERROR translating briefing: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        return {}
+
+def send_briefing_push(title, messages, country):
+    """Send briefing push notification via Firebase function
+
+    Args:
+        title: Push notification title
+        messages: Multilingual briefing messages dict (e.g., {"de": "...", "ro": "...", "ar": "..."})
+                 or string for backward compatibility
+        country: Country code (e.g., "ca", "de", "sa")
+    """
     function_url = os.getenv("FIREBASE_FUNCTION_URL") or "https://sendbriefingpushbycountry-ladydgb7za-uc.a.run.app"
-    
+
     payload = {
         "title": title,
-        "message": message,
+        "messages": messages,  # Send as multilingual object
         "country": country
     }
-    
+
     headers = {
         "Content-Type": "application/json"
     }
-    
+
+    print(f"Sending push notification to {country}")
+    print(f"Payload: title='{title}', messages type={type(messages).__name__}, country='{country}'")
+
     try:
         response = requests.post(function_url, headers=headers, json=payload)
         if response.status_code == 200:
@@ -221,30 +309,68 @@ def send_yesterday_briefing(daily_data, config):
     
     print(f"Processing top {len(top_3_articles)} articles for briefing")
     
-    # Generate briefing summary for top 3 articles
+    # Generate briefing summary for top 3 articles in base language
     briefing_message = generate_briefing_summary(top_3_articles, config)
-    
+
     if not briefing_message:
         print("Failed to generate briefing summary")
         return
-    
+
+    # Get base language and supported languages
+    base_lang = config.get("base_lang", "en")
+    lang_list = config.get("lang_list", [])
+
+    # Start with base language
+    multilingual_briefing = {
+        base_lang: briefing_message
+    }
+
+    print(f"Base language briefing ({base_lang}): {briefing_message}")
+
+    # Translate to other supported languages
+    if lang_list:
+        print(f"Translating briefing to {len(lang_list)} additional languages")
+        translations = translate_briefing(briefing_message, lang_list, config)
+
+        if translations:
+            # Merge translations with base language
+            multilingual_briefing.update(translations)
+            print(f"Total languages in briefing: {len(multilingual_briefing)}")
+        else:
+            print("Translation failed, sending base language only")
+    else:
+        print("No additional languages to translate, sending base language only")
+
     # Send push notification with yesterday's date
     yesterday_date = yesterday.strftime("%B %d") # e.g., "January 15"
     # push_title = f"Yesterday's News ({yesterday_date})"
     push_title = f"Quick News Recap"
-    # Add prefix to the briefing message
-    final_message = f"{briefing_message}"
-    
+
     country_code = config["country"].lower()
     if country_code == "saudi":
         country_code = "sa"  # Convert saudi to sa for country code
-    
-    success = send_briefing_push(push_title, final_message, country_code)
-    
-    if success:
-        print("Briefing push sent successfully")
-    else:
-        print("Failed to send briefing push")
+
+    # === TEST MODE: Server transmission disabled, logging only ===
+    print("\n" + "="*60)
+    print("📤 [TEST MODE] Data preview that would be sent to server")
+    print("="*60)
+    print(f"Title: {push_title}")
+    print(f"Country code: {country_code}")
+    print(f"\nMultilingual briefing messages:")
+    print("-"*60)
+    for lang, msg in multilingual_briefing.items():
+        print(f"  [{lang}]: {msg}")
+    print("="*60 + "\n")
+
+    # Actual server transmission is commented out for testing
+    # success = send_briefing_push(push_title, multilingual_briefing, country_code)
+    #
+    # if success:
+    #     print("Briefing push sent successfully")
+    # else:
+    #     print("Failed to send briefing push")
+
+    print("✅ [TEST MODE] Server transmission skipped - logs only")
 
 def main():
     if len(sys.argv) < 2:
