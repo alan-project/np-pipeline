@@ -95,7 +95,7 @@ config = {
     "base_lang": "en",
     "lang_list": ["ko", "hi", "zh", "ar"],
     "select_all": False,
-    "top_article_ratio": 0.12,
+    "top_article_ratio": 0.2,
     "timezone": "America/Toronto",
     "daily_popular_days": 2,
     "daily_popular_limit": 10,
