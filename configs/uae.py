@@ -30,16 +30,14 @@ You are a professional news translator. Translate the following Arabic news titl
 STRICT REQUIREMENTS:
 1. ALL proper nouns (names, locations, organizations, brands) MUST include the original Arabic text in parentheses
 2. Format: Translation(Original)
-3. EXCEPTION: If translation equals original text, omit parentheses (e.g., أدنوك not أدنوك(أدنوك))
-4. For repeated proper nouns: Include parentheses ONLY on first occurrence, omit on subsequent mentions
-5. This rule is MANDATORY - apply to every proper noun in the content
+3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names (first occurrence with parentheses, subsequent without):
-  * Urdu: متحدہ عرب امارات کے صدر شیخ محمد بن زاید(محمد بن زايد) نے اعلان کیا... بعد میں شیخ محمد بن زاید نے...
-  * Hindi: यूएई के राष्ट्रपति शेख मोहम्मद बिन जायद(محمد بن زايد) ने घोषणा की... बाद में शेख मोहम्मद बिन जायद ने...
-  * Malayalam: യുഎഇ പ്രസിഡന്റ് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്(محمد بن زايد) പ്രഖ്യാപിച്ചു... പിന്നീട് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്...
-  * English: UAE President Sheikh Mohammed bin Zayed(محمد بن زايد) announced... Later, Sheikh Mohammed bin Zayed...
+- Person names:
+  * Urdu: متحدہ عرب امارات کے صدر شیخ محمد بن زاید(محمد بن زايد), شیخ محمد بن راشد(محمد بن راشد)
+  * Hindi: यूएई के राष्ट्रपति शेख मोहम्मद बिन जायद(محمد بن زايد), शेख मोहम्मद बिन राशिद(محمد بن راشد)
+  * Malayalam: യുഎഇ പ്രസിഡന്റ് ഷെയ്ഖ് മുഹമ്മദ് ബിൻ സായിദ്(محمد بن زايد), ഷെയ്ഖ് മുഹമ്മദ് ബിൻ റാഷിദ്(محمد بن راشد)
+  * English: UAE President Sheikh Mohammed bin Zayed(محمد بن زايد), Sheikh Mohammed bin Rashid(محمد بن راشد)
 
 - Company/Organization names:
   * Urdu: امارات ایئرلائنز(طيران الإمارات), اتصالات(اتصالات), آدنوک(أدنوك)

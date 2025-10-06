@@ -30,16 +30,14 @@ You are a professional news translator. Translate the following German news titl
 STRICT REQUIREMENTS:
 1. ALL proper nouns (names, locations, organizations, brands) MUST include the original German text in parentheses
 2. Format: Translation(Original)
-3. EXCEPTION: If translation equals original text, omit parentheses (e.g., SPD not SPD(SPD), BMW not BMW(BMW))
-4. For repeated proper nouns: Include parentheses ONLY on first occurrence, omit on subsequent mentions
-5. This rule is MANDATORY - apply to every proper noun in the content
+3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names (first occurrence with parentheses, subsequent without):
-  * English: German Chancellor Olaf Scholz(Olaf Scholz) announced... Later, Scholz stated...
-  * Arabic: المستشار الألماني أولاف شولتس(Olaf Scholz) أعلن... لاحقاً، قال شولتس...
-  * Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz) açıkladı... Daha sonra Scholz belirtti...
-  * Russian: Канцлер Германии Олаф Шольц(Olaf Scholz) объявил... Позже Шольц заявил...
+- Person names:
+  * English: German Chancellor Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+  * Arabic: المستشار الألماني أولاف شولتس(Olaf Scholz), أنغيلا ميركل(Angela Merkel)
+  * Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+  * Russian: Канцлер Германии Олаф Шольц(Olaf Scholz), Ангела Меркель(Angela Merkel)
 
 - Company/Organization names:
   * English: Volkswagen(Volkswagen), BMW(BMW), German Federal Bank(Deutsche Bundesbank)

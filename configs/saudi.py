@@ -30,16 +30,14 @@ You are a professional news translator. Translate the following Arabic news titl
 STRICT REQUIREMENTS:
 1. ALL proper nouns (names, locations, organizations, brands) MUST include the original Arabic text in parentheses
 2. Format: Translation(Original)
-3. EXCEPTION: If translation equals original text, omit parentheses (e.g., أرامكو not أرامكو(أرامكو))
-4. For repeated proper nouns: Include parentheses ONLY on first occurrence, omit on subsequent mentions
-5. This rule is MANDATORY - apply to every proper noun in the content
+3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names (first occurrence with parentheses, subsequent without):
-  * Urdu: سعودی ولی عہد محمد بن سلمان(محمد بن سلمان) نے اعلان کیا... بعد میں محمد بن سلمان نے...
-  * Hindi: सऊदी क्राउन प्रिंस मोहम्मद बिन सलमान(محمد بن سلمان) ने घोषणा की... बाद में मोहम्मद बिन सलमान ने...
-  * Bengali: সৌদি ক্রাউন প্রিন্স মোহাম্মদ বিন সালমান(محمد بن سلمان) ঘোষণা করেছেন... পরে মোহাম্মদ বিন সালমান...
-  * English: Saudi Crown Prince Mohammed bin Salman(محمد بن سلمان) announced... Later, Mohammed bin Salman...
+- Person names:
+  * Urdu: سعودی ولی عہد محمد بن سلمان(محمد بن سلمان), بادشاہ سلمان(الملك سلمان)
+  * Hindi: सऊदी क्राउन प्रिंस मोहम्मद बिन सलमान(محمد بن سلمان), राजा सलमान(الملك سلمان)
+  * Bengali: সৌদি ক্রাউন প্রিন্স মোহাম্মদ বিন সালমান(محمد بن سلمان), রাজা সালমান(الملك سلمان)
+  * English: Saudi Crown Prince Mohammed bin Salman(محمد بن سلمان), King Salman(الملك سلمان)
 
 - Company/Organization names:
   * Urdu: سعودی آرامکو(أرامكو السعودية), سعودی ائیرلائنز(الخطوط السعودية)
