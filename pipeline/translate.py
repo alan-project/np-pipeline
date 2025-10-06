@@ -1,5 +1,44 @@
 import os
+import re
 from google import genai
+
+def clean_duplicate_parentheses(text):
+    """
+    Remove duplicate parentheses patterns from translated text.
+    1. ABC(ABC) → ABC (same content in parentheses)
+    2. Keep only first occurrence of each unique parenthetical term
+    """
+    if not text:
+        return text
+
+    # Step 1: Remove identical parentheses like ABC(ABC) or AAA BBB CCC(AAA BBB CCC)
+    def remove_identical(match):
+        before = match.group(1).strip()
+        inside = match.group(2).strip()
+        # If completely identical, remove parentheses
+        if before.lower() == inside.lower():
+            return before
+        return match.group(0)  # Keep original (e.g., New York(NY))
+
+    # Match text followed by parentheses
+    pattern = r'([\w\s\-\.]+)\(([^\)]+)\)'
+    text = re.sub(pattern, remove_identical, text)
+
+    # Step 2: Track and remove repeated parenthetical terms
+    seen_terms = set()
+
+    def track_duplicates(match):
+        term = match.group(1).strip()
+        if term in seen_terms:
+            return ''  # Remove duplicate parenthetical
+        seen_terms.add(term)
+        return match.group(0)  # Keep first occurrence
+
+    # Match any parenthetical content
+    parenthetical_pattern = r'\(([^\)]+)\)'
+    text = re.sub(parenthetical_pattern, track_duplicates, text)
+
+    return text
 
 def translate_ai_summary(ai_title, ai_content, lang, config):
     # Initialize Gemini client
@@ -31,6 +70,11 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
         if "Title:" in result and "Content:" in result:
             title = result.split("Title:")[1].split("Content:")[0].strip()
             content = result.split("Content:")[1].strip()
+
+            # Clean duplicate parentheses
+            title = clean_duplicate_parentheses(title)
+            content = clean_duplicate_parentheses(content)
+
             return {
                 "ai_title": title,
                 "ai_content": content
