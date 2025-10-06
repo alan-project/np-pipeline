@@ -30,14 +30,16 @@ You are a professional news translator. Translate the following Russian news tit
 STRICT REQUIREMENTS:
 1. ALL proper nouns (names, locations, organizations, brands) MUST include the original Russian text in parentheses
 2. Format: Translation(Original)
-3. This rule is MANDATORY - apply to every proper noun in the content
+3. EXCEPTION: If translation equals original text, omit parentheses (e.g., Газпром not Газпром(Газпром))
+4. For repeated proper nouns: Include parentheses ONLY on first occurrence, omit on subsequent mentions
+5. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names:
-  * English: Russian President Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
-  * Ukrainian: Президент Росії Володимир Путін(Владимир Путин), Сергій Лавров(Сергей Лавров)
-  * Tajik: Президенти Русия Владимир Путин(Владимир Путин), Сергей Лавров(Сергей Лавров)
-  * Uzbek: Rossiya prezidenti Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
+- Person names (first occurrence with parentheses, subsequent without):
+  * English: Russian President Vladimir Putin(Владимир Путин) announced... Later, Putin stated...
+  * Ukrainian: Президент Росії Володимир Путін(Владимир Путин) оголосив... Пізніше Путін заявив...
+  * Tajik: Президенти Русия Владимир Путин(Владимир Путин) эълон кард... Баъдтар Путин гуфт...
+  * Uzbek: Rossiya prezidenti Vladimir Putin(Владимир Путин) e'lon qildi... Keyinchalik Putin aytdi...
 
 - Company/Organization names:
   * English: Gazprom(Газпром), Sberbank(Сбербанк), Russian Railways(РЖД)
