@@ -2,34 +2,53 @@ import os
 import re
 from google import genai
 
-def clean_duplicate_parentheses(text):
+def clean_duplicate_parentheses(text, article_id=None):
     """
     Remove duplicate parentheses patterns from translated text.
     1. ABC(ABC) → ABC (same content in parentheses)
-    2. Keep only first occurrence of each unique parenthetical term
+    2. (ABC(ABC)) → (ABC) (nested duplicates)
+    3. Keep only first occurrence of each unique parenthetical term
     """
     if not text:
         return text
 
-    # Step 1: Remove identical parentheses like ABC(ABC) or AAA BBB CCC(AAA BBB CCC)
-    def remove_identical(match):
-        before = match.group(1).strip()
-        inside = match.group(2).strip()
-        # If completely identical, remove parentheses
-        if before.lower() == inside.lower():
-            return before
-        return match.group(0)  # Keep original (e.g., New York(NY))
+    # Log input
+    print(f"\n[{article_id}] [clean_duplicate_parentheses] Input: {text}")
+    original_text = text
 
-    # Match text followed by parentheses
-    pattern = r'([\w\s\-\.]+)\(([^\)]+)\)'
-    text = re.sub(pattern, remove_identical, text)
+    # Step 1: Remove nested duplicate parentheses like (SPD(SPD)) → (SPD)
+    # First, handle the pattern where the same text appears nested: (TEXT(TEXT))
+    nested_pattern = r'\((\w+)\(\1\)\)'
+    text = re.sub(nested_pattern, r'(\1)', text)
+    print(f"[{article_id}] [clean_duplicate_parentheses] After nested removal: {text}")
 
-    # Step 2: Track and remove repeated parenthetical terms
+    # Step 2: Remove identical parentheses like "Iris Stalzer(Iris Stalzer)" → "Iris Stalzer"
+    # Look for cases where the same words appear just before and inside parentheses
+    # Match one or more words followed by parentheses containing the same text
+    def remove_identical_simple(text):
+        """Remove cases where text is immediately followed by itself in parentheses"""
+        # Pattern to match words followed by identical text in parentheses
+        # This will match "Iris Stalzer(Iris Stalzer)" but not the whole sentence
+        pattern = r'(\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\((\1)\)'
+
+        def replace_match(match):
+            word = match.group(1)
+            in_parens = match.group(2)
+            print(f"[{article_id}] [clean_duplicate_parentheses] Found duplicate: {word}({in_parens}) → {word}")
+            return word
+
+        return re.sub(pattern, replace_match, text)
+
+    text = remove_identical_simple(text)
+    print(f"[{article_id}] [clean_duplicate_parentheses] After identical removal: {text}")
+
+    # Step 3: Track and remove repeated parenthetical terms
     seen_terms = set()
 
     def track_duplicates(match):
-        term = match.group(1).strip()
+        term = match.group(1).strip().lower()
         if term in seen_terms:
+            print(f"[{article_id}] [clean_duplicate_parentheses] Removing duplicate parenthetical: ({match.group(1)})")
             return ''  # Remove duplicate parenthetical
         seen_terms.add(term)
         return match.group(0)  # Keep first occurrence
@@ -38,13 +57,18 @@ def clean_duplicate_parentheses(text):
     parenthetical_pattern = r'\(([^\)]+)\)'
     text = re.sub(parenthetical_pattern, track_duplicates, text)
 
+    # Log output
+    print(f"[{article_id}] [clean_duplicate_parentheses] Output: {text}")
+    if original_text != text:
+        print(f"[{article_id}] [clean_duplicate_parentheses] Changed: {original_text} → {text}")
+
     return text
 
-def translate_ai_summary(ai_title, ai_content, lang, config):
+def translate_ai_summary(ai_title, ai_content, lang, config, article_id=None):
     # Initialize Gemini client
     api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print(f"ERROR: GEMINI_API_KEY is missing for translation to {lang}")
+        print(f"[{article_id}] ERROR: GEMINI_API_KEY is missing for translation to {lang}")
         return None
     
     # Set up Gemini client (remove duplicate key to avoid warnings)
@@ -65,24 +89,24 @@ def translate_ai_summary(ai_title, ai_content, lang, config):
         )
         
         result = response.text.strip()
-        print(f"\n[{lang.upper()} translation result] {result}")
+        print(f"\n[{article_id}] [{lang.upper()} translation result] {result}")
 
         if "Title:" in result and "Content:" in result:
             title = result.split("Title:")[1].split("Content:")[0].strip()
             content = result.split("Content:")[1].strip()
 
             # Clean duplicate parentheses
-            title = clean_duplicate_parentheses(title)
-            content = clean_duplicate_parentheses(content)
+            title = clean_duplicate_parentheses(title, article_id)
+            content = clean_duplicate_parentheses(content, article_id)
 
             return {
                 "ai_title": title,
                 "ai_content": content
             }
         else:
-            print(f"'{lang}' translation result format error")
+            print(f"[{article_id}] '{lang}' translation result format error")
     except Exception as e:
-        print(f"error on translation ({lang}): {e}")
+        print(f"[{article_id}] error on translation ({lang}): {e}")
     return None
 
 

@@ -35,7 +35,7 @@ def process_article(article, config, api_key):
         return None
     
     print(f"article ID {article['article_id']} generating AI category and summary")
-    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key})
+    ai_summary = generate_ai_summary(content, {**config, "api_key": api_key}, article['article_id'])
     if not ai_summary:
         print(f"article ID {article['article_id']} AI processing fail")
         return None
@@ -56,7 +56,8 @@ def process_article(article, config, api_key):
                 title,
                 ai_content,
                 lang,
-                {**config, "api_key": api_key}
+                {**config, "api_key": api_key},
+                article['article_id']
             ) for lang in config["lang_list"]
         }
         for lang, future in futures.items():

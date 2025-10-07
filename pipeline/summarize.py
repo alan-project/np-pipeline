@@ -1,11 +1,11 @@
 import os
 from google import genai
 
-def generate_ai_summary(content, config):
+def generate_ai_summary(content, config, article_id=None):
     # Initialize Gemini client
     api_key = config.get("api_key") or os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print("ERROR: GEMINI_API_KEY is missing for summarization")
+        print(f"[{article_id}] ERROR: GEMINI_API_KEY is missing for summarization")
         return None
     
     # Set up Gemini client (remove duplicate key to avoid warnings)
@@ -26,10 +26,10 @@ def generate_ai_summary(content, config):
 
         # Handle SKIP response
         if text.upper() == "SKIP":
-            print("Gemini resp: SKIP -> failed to summarize article")
+            print(f"[{article_id}] Gemini resp: SKIP -> failed to summarize article")
             return None
 
-        print("\nAI summary result:\n", text[:500])
+        print(f"\n[{article_id}] AI summary result:\n", text[:500])
 
         # Parse results for category and content
         category, summary = None, None
@@ -38,7 +38,7 @@ def generate_ai_summary(content, config):
             summary = text.split("Content:")[1].strip()
 
         if not (category and summary):
-            print("summary/category parsing fail")
+            print(f"[{article_id}] summary/category parsing fail")
             return None
 
         return {
@@ -46,7 +46,7 @@ def generate_ai_summary(content, config):
             "ai_content": summary
         }
     except Exception as e:
-        print(f"generate_ai_summary error: {e}")
+        print(f"[{article_id}] generate_ai_summary error: {e}")
     return None
 
 
