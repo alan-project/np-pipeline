@@ -27,14 +27,13 @@ def clean_duplicate_parentheses(text, article_id=None):
     # Match one or more words followed by parentheses containing the same text
     def remove_identical_simple(text):
         """Remove cases where text is immediately followed by itself in parentheses"""
-        # Pattern to match words followed by identical text in parentheses
-        # This will match "Iris Stalzer(Iris Stalzer)" but not the whole sentence
-        pattern = r'(\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\((\1)\)'
+        # Pattern to match any text (excluding parentheses) followed by identical text in parentheses
+        # This handles names with special chars like "Elsässer", "Putin'in", etc.
+        pattern = r'([^\s()]+(?:\s+[^\s()]+)*)\s*\(\1\)'
 
         def replace_match(match):
             word = match.group(1)
-            in_parens = match.group(2)
-            print(f"[{article_id}] [clean_duplicate_parentheses] Found duplicate: {word}({in_parens}) → {word}")
+            print(f"[{article_id}] [clean_duplicate_parentheses] Found duplicate: {word}({word}) → {word}")
             return word
 
         return re.sub(pattern, replace_match, text)
