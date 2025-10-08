@@ -12,7 +12,7 @@ from firebase_admin import credentials, firestore
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Configuration constants
-DEFAULT_HOURS_BACK = 6  # Hours to look back for popular articles
+DEFAULT_HOURS_BACK = 5  # Hours to look back for popular articles
 FIREBASE_FUNCTION_URL = os.getenv("FIREBASE_FUNCTION_URL") or "https://us-central1-the-north-news.cloudfunctions.net/sendArticlePushByLanguage"
 
 def get_time_range(local_tz, hours_back=DEFAULT_HOURS_BACK):
