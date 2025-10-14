@@ -11,7 +11,7 @@ on:
       hours_back:
         description: 'Hours to look back for popular articles'
         required: false
-        default: '6'
+        default: '5'
         type: string
 
 jobs:
@@ -40,5 +40,5 @@ jobs:
           NEWS_API_URL: ${{ secrets.CANADA_API_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          hours_back="${{ github.event.inputs.hours_back || '6' }}"
+          hours_back="${{ github.event.inputs.hours_back || '5' }}"
           python pipeline/push_notification_pipeline.py canada $hours_back
