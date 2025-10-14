@@ -24,6 +24,27 @@ Title: <translated title>
 Content: <translated summary>
 """
 
+    # Language-specific examples
+    examples = {
+        "ko": """- Person names: 저스틴 트뤼도(Justin Trudeau), 조 바이든(Joe Biden)
+- Company/Organization names: 유엔(UN), 애플(Apple), 구글(Google)
+- City/Country names: 토론토(Toronto), 오타와(Ottawa), 밴쿠버(Vancouver)""",
+
+        "hi": """- Person names: जस्टिन ट्रूडो(Justin Trudeau), जो बाइडन(Joe Biden)
+- Company/Organization names: संयुक्त राष्ट्र(UN), एप्पल(Apple), गूगल(Google)
+- City/Country names: टोरंटो(Toronto), ओटावा(Ottawa), वैंकूवर(Vancouver)""",
+
+        "zh": """- Person names: 贾斯汀·特鲁多(Justin Trudeau), 乔·拜登(Joe Biden)
+- Company/Organization names: 联合国(UN), 苹果(Apple), 谷歌(Google)
+- City/Country names: 多伦多(Toronto), 渥太华(Ottawa), 温哥华(Vancouver)""",
+
+        "ar": """- Person names: جاستن ترودو(Justin Trudeau), جو بايدن(Joe Biden)
+- Company/Organization names: الأمم المتحدة(UN), أبل(Apple), جوجل(Google)
+- City/Country names: تورونتو(Toronto), أوتاوا(Ottawa), فانكوفر(Vancouver)"""
+    }
+
+    lang_examples = examples.get(lang, examples["ko"])  # Default to Korean if lang not found
+
     return f"""
 You are a professional news translator. Translate the following English news title and summary into {lang}.
 
@@ -33,29 +54,14 @@ STRICT REQUIREMENTS:
 3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names:
-  * Korean: 저스틴 트뤼도(Justin Trudeau), 조 바이든(Joe Biden)
-  * Hindi: जस्टिन ट्रूडो(Justin Trudeau), जो बाइडन(Joe Biden)
-  * Chinese: 贾斯汀·特鲁多(Justin Trudeau), 乔·拜登(Joe Biden)
-  * Arabic: جاستن ترودو(Justin Trudeau), جو بايدن(Joe Biden)
-
-- Company/Organization names:
-  * Korean: 유엔(UN), 애플(Apple), 구글(Google)
-  * Hindi: संयुक्त राष्ट्र(UN), एप्पल(Apple), गूगल(Google)
-  * Chinese: 联合国(UN), 苹果(Apple), 谷歌(Google)
-  * Arabic: الأمم المتحدة(UN), أبل(Apple), جوجل(Google)
-
-- City/Country names:
-  * Korean: 토론토(Toronto), 오타와(Ottawa), 밴쿠버(Vancouver)
-  * Hindi: टोरंटो(Toronto), ओटावा(Ottawa), वैंकूवर(Vancouver)
-  * Chinese: 多伦多(Toronto), 渥太华(Ottawa), 温哥华(Vancouver)
-  * Arabic: تورونتو(Toronto), أوتاوا(Ottawa), فانكوفر(Vancouver)
+{lang_examples}
 
 IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
 - Do not add any extra comments or labels.
+- CRITICAL: Use ONLY {lang} script/characters in your translation. Do NOT mix characters from other languages.
 
 Return your response in this format:
 Title: <translated title>

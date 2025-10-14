@@ -24,6 +24,27 @@ Title: <translated title>
 Content: <translated summary>
 """
 
+    # Language-specific examples
+    examples = {
+        "ur": """- Person names: سعودی ولی عہد محمد بن سلمان(محمد بن سلمان), بادشاہ سلمان(الملك سلمان)
+- Company/Organization names: سعودی آرامکو(أرامكو السعودية), سعودی ائیرلائنز(الخطوط السعودية)
+- City/Country names: ریاض(الرياض), جدہ(جدة), مکہ مکرمہ(مكة المكرمة), مدینہ منورہ(المدينة المنورة)""",
+
+        "hi": """- Person names: सऊदी क्राउन प्रिंस मोहम्मद बिन सलमान(محمد بن سلمان), राजा सलमान(الملك سلمان)
+- Company/Organization names: सऊदी अरामको(أرامكو السعودية), सऊदी एयरलाइंस(الخطوط السعودية)
+- City/Country names: रियाद(الرياض), जेद्दाह(جدة), मक्का(مكة المكرمة), मदीना(المدينة المنورة)""",
+
+        "bn": """- Person names: সৌদি ক্রাউন প্রিন্স মোহাম্মদ বিন সালমান(محمد بن سلمان), রাজা সালমান(الملك سلمان)
+- Company/Organization names: সৌদি আরামকো(أرامكو السعودية), সৌদি এয়ারলাইন্স(الخطوط السعودية)
+- City/Country names: রিয়াদ(الرياض), জেদ্দা(جدة), মক্কা(مكة المكرمة), মদিনা(المدينة المنورة)""",
+
+        "en": """- Person names: Saudi Crown Prince Mohammed bin Salman(محمد بن سلمان), King Salman(الملك سلمان)
+- Company/Organization names: Saudi Aramco(أرامكو السعودية), Saudi Airlines(الخطوط السعودية)
+- City/Country names: Riyadh(الرياض), Jeddah(جدة), Mecca(مكة المكرمة), Medina(المدينة المنورة)"""
+    }
+
+    lang_examples = examples.get(lang, examples["en"])  # Default to English if lang not found
+
     return f"""
 You are a professional news translator. Translate the following Arabic news title and summary into {lang}.
 
@@ -33,29 +54,14 @@ STRICT REQUIREMENTS:
 3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names:
-  * Urdu: سعودی ولی عہد محمد بن سلمان(محمد بن سلمان), بادشاہ سلمان(الملك سلمان)
-  * Hindi: सऊदी क्राउन प्रिंस मोहम्मद बिन सलमान(محمد بن سلمان), राजा सलमान(الملك سلمان)
-  * Bengali: সৌদি ক্রাউন প্রিন্স মোহাম্মদ বিন সালমান(محمد بن سلمان), রাজা সালমান(الملك سلمان)
-  * English: Saudi Crown Prince Mohammed bin Salman(محمد بن سلمان), King Salman(الملك سلمان)
-
-- Company/Organization names:
-  * Urdu: سعودی آرامکو(أرامكو السعودية), سعودی ائیرلائنز(الخطوط السعودية)
-  * Hindi: सऊदी अरामको(أرامكو السعودية), सऊदी एयरलाइंस(الخطوط السعودية)
-  * Bengali: সৌদি আরামকো(أرامكو السعودية), সৌদি এয়ারলাইন্স(الخطوط السعودية)
-  * English: Saudi Aramco(أرامكو السعودية), Saudi Airlines(الخطوط السعودية)
-
-- City/Country names:
-  * Urdu: ریاض(الرياض), جدہ(جدة), مکہ مکرمہ(مكة المكرمة), مدینہ منورہ(المدينة المنورة)
-  * Hindi: रियाद(الرياض), जेद्दाह(جدة), मक्का(مكة المكرمة), मदीना(المدينة المنورة)
-  * Bengali: রিয়াদ(الرياض), জেদ্দা(جدة), মক্কা(مكة المكرمة), মদিনা(المدينة المنورة)
-  * English: Riyadh(الرياض), Jeddah(جدة), Mecca(مكة المكرمة), Medina(المدينة المنورة)
+{lang_examples}
 
 IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
 - Do not add any extra comments or labels.
+- CRITICAL: Use ONLY {lang} script/characters in your translation. Do NOT mix characters from other languages.
 
 Return your response in this format:
 Title: <translated title>

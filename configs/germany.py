@@ -24,6 +24,31 @@ Title: <translated title>
 Content: <translated summary>
 """
 
+    # Language-specific examples
+    examples = {
+        "ro": """- Person names: Cancelarul german Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+- Company/Organization names: Volkswagen(Volkswagen), BMW(BMW), Banca Federală Germană(Deutsche Bundesbank)
+- City/Country names: Berlin(Berlin), München(München), Frankfurt(Frankfurt), Hamburg(Hamburg)""",
+
+        "ar": """- Person names: المستشار الألماني أولاف شولتس(Olaf Scholz), أنغيلا ميركل(Angela Merkel)
+- Company/Organization names: فولكس فاغن(Volkswagen), بي إم دبليو(BMW), البنك الفيدرالي الألماني(Deutsche Bundesbank)
+- City/Country names: برلين(Berlin), ميونخ(München), فرانكفورت(Frankfurt), هامبورغ(Hamburg)""",
+
+        "tr": """- Person names: Almanya Şansölyesi Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+- Company/Organization names: Volkswagen(Volkswagen), BMW(BMW), Alman Federal Bankası(Deutsche Bundesbank)
+- City/Country names: Berlin(Berlin), Münih(München), Frankfurt(Frankfurt), Hamburg(Hamburg)""",
+
+        "ru": """- Person names: Канцлер Германии Олаф Шольц(Olaf Scholz), Ангела Меркель(Angela Merkel)
+- Company/Organization names: Фольксваген(Volkswagen), БМВ(BMW), Немецкий федеральный банк(Deutsche Bundesbank)
+- City/Country names: Берлин(Berlin), Мюнхен(München), Франкфурт(Frankfurt), Гамбург(Hamburg)""",
+
+        "en": """- Person names: German Chancellor Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
+- Company/Organization names: Volkswagen(Volkswagen), BMW(BMW), German Federal Bank(Deutsche Bundesbank)
+- City/Country names: Berlin(Berlin), Munich(München), Frankfurt(Frankfurt), Hamburg(Hamburg)"""
+    }
+
+    lang_examples = examples.get(lang, examples["en"])  # Default to English if lang not found
+
     return f"""
 You are a professional news translator. Translate the following German news title and summary into {lang}.
 
@@ -33,29 +58,14 @@ STRICT REQUIREMENTS:
 3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names:
-  * English: German Chancellor Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
-  * Arabic: المستشار الألماني أولاف شولتس(Olaf Scholz), أنغيلا ميركل(Angela Merkel)
-  * Turkish: Almanya Şansölyesi Olaf Scholz(Olaf Scholz), Angela Merkel(Angela Merkel)
-  * Russian: Канцлер Германии Олаф Шольц(Olaf Scholz), Ангела Меркель(Angela Merkel)
-
-- Company/Organization names:
-  * English: Volkswagen(Volkswagen), BMW(BMW), German Federal Bank(Deutsche Bundesbank)
-  * Arabic: فولكس فاغن(Volkswagen), بي إم دبليو(BMW), البنك الفيدرالي الألماني(Deutsche Bundesbank)
-  * Turkish: Volkswagen(Volkswagen), BMW(BMW), Alman Federal Bankası(Deutsche Bundesbank)
-  * Russian: Фольксваген(Volkswagen), БМВ(BMW), Немецкий федеральный банк(Deutsche Bundesbank)
-
-- City/Country names:
-  * English: Berlin(Berlin), Munich(München), Frankfurt(Frankfurt), Hamburg(Hamburg)
-  * Arabic: برلين(Berlin), ميونخ(München), فرانكفورت(Frankfurt), هامبورغ(Hamburg)
-  * Turkish: Berlin(Berlin), Münih(München), Frankfurt(Frankfurt), Hamburg(Hamburg)
-  * Russian: Берлин(Berlin), Мюнхен(München), Франкфурт(Frankfurt), Гамбург(Hamburg)
+{lang_examples}
 
 IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
 - Do not add any extra comments or labels.
+- CRITICAL: Use ONLY {lang} script/characters in your translation. Do NOT mix characters from other languages.
 
 Return your response in this format:
 Title: <translated title>

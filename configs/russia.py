@@ -24,6 +24,27 @@ Title: <translated title>
 Content: <translated summary>
 """
 
+    # Language-specific examples
+    examples = {
+        "en": """- Person names: Russian President Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
+- Company/Organization names: Gazprom(Газпром), Sberbank(Сбербанк), Russian Railways(РЖД)
+- City/Country names: Moscow(Москва), Saint Petersburg(Санкт-Петербург), Novosibirsk(Новосибирск)""",
+
+        "uk": """- Person names: Президент Росії Володимир Путін(Владимир Путин), Сергій Лавров(Сергей Лавров)
+- Company/Organization names: Газпром(Газпром), Сбербанк(Сбербанк), Російські залізниці(РЖД)
+- City/Country names: Москва(Москва), Санкт-Петербург(Санкт-Петербург), Новосибірськ(Новосибирск)""",
+
+        "tg": """- Person names: Президенти Русия Владимир Путин(Владимир Путин), Сергей Лавров(Сергей Лавров)
+- Company/Organization names: Газпром(Газпром), Сбербанк(Сбербанк), Роҳи оҳани Русия(РЖД)
+- City/Country names: Москва(Москва), Санкт-Петербург(Санкт-Петербург), Новосибирск(Новосибирск)""",
+
+        "uz": """- Person names: Rossiya prezidenti Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
+- Company/Organization names: Gazprom(Газпром), Sberbank(Сбербанк), Rossiya temir yoʻllari(РЖД)
+- City/Country names: Moskva(Москва), Sankt-Peterburg(Санкт-Петербург), Novosibirsk(Новосибирск)"""
+    }
+
+    lang_examples = examples.get(lang, examples["en"])  # Default to English if lang not found
+
     return f"""
 You are a professional news translator. Translate the following Russian news title and summary into {lang}.
 
@@ -33,29 +54,14 @@ STRICT REQUIREMENTS:
 3. This rule is MANDATORY - apply to every proper noun in the content
 
 DETAILED EXAMPLES for {lang}:
-- Person names:
-  * English: Russian President Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
-  * Ukrainian: Президент Росії Володимир Путін(Владимир Путин), Сергій Лавров(Сергей Лавров)
-  * Tajik: Президенти Русия Владимир Путин(Владимир Путин), Сергей Лавров(Сергей Лавров)
-  * Uzbek: Rossiya prezidenti Vladimir Putin(Владимир Путин), Sergey Lavrov(Сергей Лавров)
-
-- Company/Organization names:
-  * English: Gazprom(Газпром), Sberbank(Сбербанк), Russian Railways(РЖД)
-  * Ukrainian: Газпром(Газпром), Сбербанк(Сбербанк), Російські залізниці(РЖД)
-  * Tajik: Газпром(Газпром), Сбербанк(Сбербанк), Роҳи оҳани Русия(РЖД)
-  * Uzbek: Gazprom(Газпром), Sberbank(Сбербанк), Rossiya temir yoʻllari(РЖД)
-
-- City/Country names:
-  * English: Moscow(Москва), Saint Petersburg(Санкт-Петербург), Novosibirsk(Новосибирск)
-  * Ukrainian: Москва(Москва), Санкт-Петербург(Санкт-Петербург), Новосибірськ(Новосибирск)
-  * Tajik: Москва(Москва), Санкт-Петербург(Санкт-Петербург), Новосибирск(Новосибирск)
-  * Uzbek: Moskva(Москва), Sankt-Peterburg(Санкт-Петербург), Novosibirsk(Новосибирск)
+{lang_examples}
 
 IMPORTANT NOTES:
 - For the title, translate naturally in {lang} but keep it short and concise. Avoid using parentheses in the title.
 - Maintain a neutral, objective tone suitable for news articles.
 - Use formal language and avoid conversational tone.
 - Do not add any extra comments or labels.
+- CRITICAL: Use ONLY {lang} script/characters in your translation. Do NOT mix characters from other languages.
 
 Return your response in this format:
 Title: <translated title>
