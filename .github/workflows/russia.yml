@@ -1,9 +1,9 @@
-# .github/workflows/canada.yml
+# .github/workflows/russia.yml
 name: Russia - News Pipeline
 
 on:
-  schedule:
-    - cron: '0 */2 * * *'
+  # schedule:
+  #   - cron: '0 */2 * * *'
   workflow_dispatch:
 
 jobs:

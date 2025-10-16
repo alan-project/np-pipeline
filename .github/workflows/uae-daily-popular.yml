@@ -2,8 +2,10 @@
 name: UAE - Daily Popular Pipeline
 
 on:
-  # schedule:
-  #   - cron: '0 6 * * *'
+  schedule:
+    # Run at 9:00 AM UAE Time (UTC+4)
+    # 9:00 AM UAE = 05:00 UTC
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:

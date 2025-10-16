@@ -2,10 +2,10 @@
 name: Russia - Push Notification Pipeline
 
 on:
-  schedule:
-    # Run at 12:00 PM and 5:00 PM Moscow Time (UTC+3)
-    # 12:00 PM MSK = 09:00 UTC, 5:00 PM MSK = 14:00 UTC
-    - cron: '0 9,14 * * *'  # 12:00 PM and 5:00 PM Moscow Time
+  # schedule:
+  #   # Run at 12:00 PM and 5:00 PM Moscow Time (UTC+3)
+  #   # 12:00 PM MSK = 09:00 UTC, 5:00 PM MSK = 14:00 UTC
+  #   - cron: '0 9,14 * * *'  # 12:00 PM and 5:00 PM Moscow Time
   workflow_dispatch:
     inputs:
       hours_back:
