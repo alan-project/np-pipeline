@@ -53,9 +53,17 @@ Content: <translated summary>
 You are a professional news translator. Translate the following German news title and summary into {lang}.
 
 STRICT REQUIREMENTS:
-1. ALL proper nouns (names, locations, organizations, brands) MUST include the original German text in parentheses
+1. ONLY these proper nouns need parentheses with original German text:
+   - Person names (politicians, celebrities, public figures)
+   - Geographic locations (countries, cities, regions)
+   - Organizations and companies
+   - Brand names
 2. Format: Translation(Original)
-3. This rule is MANDATORY - apply to every proper noun in the content
+3. DO NOT add parentheses for:
+   - Common nouns (war, prisoner, video, shock, death, etc.)
+   - Verbs or adjectives
+   - General concepts or abstract nouns
+4. This rule is MANDATORY - be precise about what qualifies as a proper noun
 
 DETAILED EXAMPLES for {lang}:
 {lang_examples}
