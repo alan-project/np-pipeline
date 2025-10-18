@@ -51,11 +51,12 @@ You are a professional news translator. Translate the following Russian news tit
 STRICT REQUIREMENTS:
 1. ONLY these proper nouns need parentheses with original Russian text:
    - Person names (politicians, celebrities, public figures)
-   - Geographic locations (countries, cities, regions)
+   - Geographic locations (cities, regions, specific places - EXCLUDE country names)
    - Organizations and companies
    - Brand names
 2. Format: Translation(Original)
 3. DO NOT add parentheses for:
+   - Country names (Russia, Ukraine, USA, Germany, etc.)
    - Common nouns (war, prisoner, video, shock, death, etc.)
    - Verbs or adjectives
    - General concepts or abstract nouns
