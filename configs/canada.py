@@ -87,7 +87,8 @@ Selection criteria:
 - If no Canada/North America articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
-- Avoid selecting multiple articles with very similar or identical titles
+
+CRITICAL: NO DUPLICATE TOPICS - Each article must cover a DIFFERENT event/story. If multiple articles discuss the same topic, select ONLY ONE.
 
 CRITICAL: You must copy EXACTLY the Article ID as shown below. Do NOT modify, shorten, or change any characters.
 - Copy the entire ID string character by character

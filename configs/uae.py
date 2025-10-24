@@ -87,11 +87,18 @@ Selection criteria:
 - If no UAE/Middle East articles are available, select the most globally important news
 - Overall importance and public impact
 - Reader engagement potential
-- Avoid selecting multiple articles with very similar or identical titles
 
-IMPORTANT: You must respond with EXACTLY the Article ID as shown in the list below.
-Return ONLY the article IDs of the selected articles, one per line, nothing else.
-You MUST select {top_n} articles even if none are specifically about UAE/Middle East.
+CRITICAL: NO DUPLICATE TOPICS - Each article must cover a DIFFERENT event/story. If multiple articles discuss the same topic, select ONLY ONE.
+
+CRITICAL: You must copy EXACTLY the Article ID as shown below. Do NOT modify, shorten, or change any characters.
+- Copy the entire ID string character by character
+- Double-check each ID before including it in your response
+- Return ONLY the article IDs, one per line, no additional text
+- You MUST select exactly {top_n} articles
+
+Example format:
+eaf5dbb6c306b8ab5f539ed210b18958
+a153b83d4640740c93766d23dbafcd67
 """
 
 config = {
@@ -102,7 +109,7 @@ config = {
     "base_lang": "ar",
     "lang_list": ["ur", "hi", "ml", "en"],
     "select_all": False,
-    "top_article_ratio": 0.10,
+    "top_article_ratio": 0.11,
     "timezone": "Asia/Dubai",
     "daily_popular_days": 2,
     "daily_popular_limit": 10,
