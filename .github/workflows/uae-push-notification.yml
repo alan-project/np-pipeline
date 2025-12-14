@@ -2,10 +2,10 @@
 name: UAE - Push Notification Pipeline
 
 on:
-  schedule:
-    # Run at 12:00 PM and 6:00 PM UAE time (UTC+4)
-    # 12:00 PM UAE = 08:00 UTC, 6:00 PM UAE = 14:00 UTC
-    - cron: '0 8,14 * * *'  # 12:00 PM and 6:00 PM UAE Time
+  # schedule:
+  #   # Run at 12:00 PM and 6:00 PM UAE time (UTC+4)
+  #   # 12:00 PM UAE = 08:00 UTC, 6:00 PM UAE = 14:00 UTC
+  #   - cron: '0 8,14 * * *'  # 12:00 PM and 6:00 PM UAE Time
   workflow_dispatch:
     inputs:
       hours_back:

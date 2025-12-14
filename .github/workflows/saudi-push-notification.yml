@@ -2,10 +2,10 @@
 name: Saudi Arabia - Push Notification Pipeline
 
 on:
-  schedule:
-    # Run at 12:00 PM and 6:00 PM Saudi Arabia Time (AST UTC+3)
-    # 12:00 PM AST = 09:00 UTC, 6:00 PM AST = 15:00 UTC
-    - cron: '0 9,15 * * *'  # 12:00 PM and 6:00 PM Saudi Arabia Time
+  # schedule:
+  #   # Run at 12:00 PM and 6:00 PM Saudi Arabia Time (AST UTC+3)
+  #   # 12:00 PM AST = 09:00 UTC, 6:00 PM AST = 15:00 UTC
+  #   - cron: '0 9,15 * * *'  # 12:00 PM and 6:00 PM Saudi Arabia Time
   workflow_dispatch:
     inputs:
       hours_back:

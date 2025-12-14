@@ -1,10 +1,10 @@
 name: Saudi - Daily Popular Pipeline
 
 on:
-  schedule:
-    # Run at 9:00 AM Saudi Arabia Time (AST UTC+3)
-    # 9:00 AM AST = 06:00 UTC
-    - cron: '0 6 * * *'
+  # schedule:
+  #   # Run at 9:00 AM Saudi Arabia Time (AST UTC+3)
+  #   # 9:00 AM AST = 06:00 UTC
+  #   - cron: '0 6 * * *'
   workflow_dispatch:
 
 jobs:
